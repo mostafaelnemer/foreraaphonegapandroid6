@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zxx">
+
+<!-- Mirrored from kiswa.net/themes/star-restaurant/orange-restaurant/register.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 04 Apr 2018 08:32:01 GMT -->
+<head>
+        <title>Register</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="icon" href="images/favicon.png" type="image/x-icon">
+
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300italic,800italic,800,700italic,700,600italic,600,400italic,300%7CRoboto+Condensed:400,400i,700,700i%7CGreat+Vibes" rel="stylesheet">
+
+        <!-- Bootstrap Stylesheet -->
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+
+        <!-- Font Awesome Stylesheet -->
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+
+        <!-- Custom Stylesheets -->
+        <link rel="stylesheet" href="css/style.css">
+    <!--<link rel="stylesheet" href="css/orange.css">-->
+    <link rel="stylesheet" href="css/purple.css">
+    <script type="text/javascript" src="cordova.js"></script>
+    </head>
+
+<body class="page-body">
+<!--====== LOADER =====-->
+<div class="loader"></div>
+<!--============ SIDE-NAV =============-->
+<div w3-include-html="include/side_nav.html" class="sidenav-content"></div>
+<!-- end sidenav-content -->
+<!--=============== FULLSCR-NAV ==============-->
+<div w3-include-html="include/fullscr_nav.html" id="fullscr-nav" class="fullscr-navigation"></div>
+<!-- end fullscr-nav -->
+<!--================ SHOPPING-CART ==============-->
+<div w3-include-html="include/shopping_cart.html" id="shopping-cart-sidebar" class="shc-sidebar"></div>
+<!-- shopping-cart-sidebar -->
+<!--============== USER-PROFILE-SIDEBAR =============-->
+<div w3-include-html="include/user_profile_sidebar.html" id="user-profile-sidebar" class="user-prf-sidebar"></div>
+<!-- end user-profile-sidebar -->
+
+
+
+        <div class="canvas">
+
+            <div class="overlay-black"></div>
+
+            <!--========= HEADER =========-->
+            <div w3-include-html="include/header.html" class="header"></div>
+            
+            <!--========= PAGE-COVER =========-->
+            <div class="page-cover">
+                <div class="container-fluid">
+                    <h3><span class="cover-left-icon pull-left"><i class="fa fa-user-plus"></i></span>Register<span class="cover-right-icon pull-right"><i class="fa fa-user-plus"></i></span></h3>
+                </div><!-- end container-fluid -->
+            </div><!-- end page-cover -->
+            
+         
+            <!--=================== PAGE-WRAPPER ================-->
+            <section class="page-wrapper innerpage-section-padding">
+                <div id="register-page" >
+                    <div class="container-fluid text-center">
+                        <div class="innerpage-heading">
+                            <h3 trans-lang-html="register_now"></h3>
+                            <p trans-lang-html="login_to_start_add_your_orders"></p>
+                        </div><!-- end innerpage-heading -->
+                        <div class="form-page-connect-social">
+                            <ul class="list-unstyled">
+                                <!--<li><button id="fb_login" class="btn btn-block fb"><span><i class="fab fa-facebook-f"></i></span>Facebook</button></li>-->
+                                <!--<li><button class="btn btn-block gm"><span><i class="fab fa-google"></i></span>Gmail</button></li>-->
+                                <!--<li><button class="btn btn-block any">Login With Any Other Account</button></li>-->
+                            </ul>
+                        </div><!-- end form-page-connect-social -->
+                        <div class="clearfix"></div>
+                       <!-- <h4>OR</h4>-->
+                        <div class="clearfix"></div>
+                        <form class="custom-form" id="register-form">
+                            <div id="response"></div>
+                            <input type="hidden" id="social" name="social" value="no">
+                            <input type="hidden" name="type" value="customer">
+
+                            <div class="form-group">
+                                 <div class="input-group">
+                                    <input type="text" id="name" name="name" class="form-control" trans-lang-placeholder="name"   required/>
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                 </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                 <div class="input-group">
+                                    <input type="email" id="email" name="email" class="form-control" trans-lang-placeholder="email"   required/>
+                                    <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="tel" id="phone" name="phone" class="form-control" trans-lang-placeholder="phone_number"   required/>
+                                    <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                 <div class="input-group">
+                                    <input type="password" id="password" name="password" class="form-control" trans-lang-placeholder="password"   required/>
+                                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                 <div class="input-group">
+                                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" trans-lang-placeholder="conf_pass"  required/>
+                                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" id="regbut" class="btn btn-orange btn-radius" trans-lang-html="register_now"></button>
+                        </form>
+                        
+                        <div class="form-page-links">
+                            <p> <a href="index.html" trans-lang-html="register_now"></a>  <span trans-lang-html="already_have_acc" ></span> </p>
+                        </div><!-- end form-page-links -->
+
+                    </div><!-- end container-fluid -->
+                </div><!-- end register-page -->
+            </section><!-- end page-wrapper -->
+            
+            
+            <!--=============== FOOTER ===============-->
+            <!--<section id="footer" class="section-padding">
+                <div class="container-fluid text-center">
+                    <h3><span><i class="far fa-star"></i>Res</span>taurant</h3>
+                    <ul class="footer-contact list-unstyled">
+                        <li><span><i class="fa fa-map-marker-alt"></i></span>Street # 3, Lorem ipsum dolor , California. </li>
+                        <li><span><i class="fa fa-envelope"></i></span>info@starrestaurant.com</li>
+                        <li><span><i class="fa fa-phone"></i></span>+123 1234 123456</li>
+                    </ul>
+
+                    <ul class="footer-social list-unstyled list-inline">
+                        <li><a href="#"><span><i class="fab fa-facebook-f"></i></span></a></li>
+                        <li><a href="#"><span><i class="fab fa-instagram"></i></span></a></li>
+                        <li><a href="#"><span><i class="fab fa-pinterest"></i></span></a></li>
+                        <li><a href="#"><span><i class="fab fa-twitter"></i></span></a></li>
+                        <li><a href="#"><span><i class="fab fa-dribbble"></i></span></a></li>
+                    </ul>
+                    <p class="copyright">© 2018 <a href="#"><span><i class="far fa-star"></i></span>Restaurant</a>. All rights reserved.</p>
+                </div>&lt;!&ndash; end container-fluid &ndash;&gt;
+            </section>--><!-- end footer -->
+            
+        </div><!-- end canvas -->
+        
+          
+   		<!-- Page Scripts Starts -->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/custom-navigation.js"></script>
+        <script src="js/jquery.validate.min.js"></script>
+        <script src="js/index.js"></script>
+        <script src="js/register.js"></script>
+
+        <!-- Page Scripts Ends -->
+    
+    </body>
+
+</html>
