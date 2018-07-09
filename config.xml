@@ -13,7 +13,7 @@
     <preference name="android-minSdkVersion" value="16" />
     <plugin name="cordova-plugin-whitelist" spec="^1.3.3" />
     <plugin name="cordova-plugin-firebase" spec="^1.0.5" />
-    <plugin name="de.appplant.cordova.plugin.local-notification" spec="~0.8.5" />
+    <plugin name="cordova-plugin-local-notification" spec="^0.9.0-beta.2" />
     <plugin name="cordova-plugin-battery-status" spec="^2.0.2" />
     <plugin name="cordova-plugin-camera" spec="^4.0.3" />
     <plugin name="cordova-plugin-media-capture" spec="^3.0.2" />
