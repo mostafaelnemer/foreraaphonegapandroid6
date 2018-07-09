@@ -23,7 +23,7 @@
     <plugin name="cordova-plugin-inappbrowser" spec="^3.0.0" />
     <plugin name="cordova-plugin-network-information" spec="^2.0.1" />
     <plugin name="cordova-plugin-vibration" spec="^3.1.0" />
-    <plugin name="cordova-plugin-file-transfer" spec="^1.5.2" />
+    <plugin name="cordova-plugin-file-transfer" spec="^2.0.2" />
     <platform name="android">
         <icon density="ldpi" src="www/res/icon/android/drawable-ldpi-icon.png" />
         <icon density="mdpi" src="www/res/icon/android/drawable-mdpi-icon.png" />
