@@ -70,6 +70,15 @@
 <script src="js/custom-navigation.js"></script>
 <script src="js/jquery.validate.min.js"></script>
 <script src="js/index.js"></script>
+<script>
+    window.document.addEventListener("scroll", function(){
+        if(window.pageYOffset == 0){
+            navigator.geolocation.getCurrentPosition(onSuccess, onError);
+            window.scrollBy(0, 100);
+
+        }
+    },false)
+</script>
 <!--<script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyAQEddaDk0teVRCde15IqYQrrl0vMilKXo"></script>-->
 <!--
 <script type="text/javascript" src="js/markerwithlabel.js"></script>

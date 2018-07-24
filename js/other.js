@@ -4,6 +4,13 @@ if(serviceData){
     serviceData=JSON.parse(serviceData);
     if(serviceData.type=='other'){
         serviceSearchOnGoogleMap(serviceData);
+        window.document.addEventListener("scroll", function(){
+            if(window.pageYOffset == 0){
+                serviceSearchOnGoogleMap(serviceData);
+                window.scrollBy(0, 100);
+
+            }
+        },false)
     }else{
         window.location.href="services.html";
     }
@@ -29,6 +36,29 @@ if(serviceData){
             }
 
         });
+        window.document.addEventListener("scroll", function(){
+            if(window.pageYOffset == 0){
+                $.ajax({
+                    type: "GET",
+                    url: makeURL('foreraa_services/'+id),
+                    success: function (msg) {
+                        //getMessages(msg,"#response")
+                        $(".loader").hide();
+                        if(msg.success){
+                            if(msg.result.type=='service'){
+                                window.sessionStorage.setItem("serviceData", JSON.stringify(msg.result));
+                                serviceSearchOnGoogleMap(JSON.stringify(msg.result));
+                                window.scrollBy(0, 100);
+                            }else{
+                                window.location.href="services.html";
+                            }
+
+                        }
+                    }
+
+                });
+            }
+        },false)
     }else{
         window.location.href="services.html";
     }

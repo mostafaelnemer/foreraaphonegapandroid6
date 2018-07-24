@@ -120,7 +120,8 @@
                         <div class="form-page-links">
                             <p> <a href="index.html" trans-lang-html="register_now"></a>  <span trans-lang-html="already_have_acc" ></span> </p>
                         </div><!-- end form-page-links -->
-
+                        <button id="facebook-btn" class="btn btn-primary" onclick="facebookLogin()"><i class="fa fa-facebook"></i></button>
+                        <button id="twitter-btn" class="btn btn-primary" onclick="twitterLogin()"><i class="fa fa-twitter"></i></button>
                     </div><!-- end container-fluid -->
                 </div><!-- end register-page -->
             </section><!-- end page-wrapper -->
@@ -157,7 +158,40 @@
         <script src="js/jquery.validate.min.js"></script>
         <script src="js/index.js"></script>
         <script src="js/register.js"></script>
-
+        <script>
+            function facebookLogin(){
+                facebookConnectPlugin.login(["public_profile","email"],function(result){
+                    console.log(JSON.stringify(result));
+                    facebookConnectPlugin.api("/me?fields=email,name,picture",["public_profile","email"],function(userData){
+                        console.log(userData);
+                        $("#register-form #social").val('facebook');
+                        $("#register-form #name").val(userData.name);
+                        $("#register-form #email").val(userData.email);
+                    },function(error){
+                        console.log(error);
+                    })
+                },function(error){
+                    console.log(error);
+                });
+            }
+            function twitterLogin(){
+                TwitterConnect.login(
+                    function(result) {
+                        console.log('Successful login!');
+                        console.log(result);
+                    }, function(error) {
+                        console.log('Error logging in');
+                        console.log(error);
+                    }
+                );
+            }
+            window.document.addEventListener("scroll", function(){
+                if(window.pageYOffset == 0){
+                    $("#register-form")[0].reset();
+                    window.scrollBy(0, 100);
+                }
+            },false)
+        </script>
         <!-- Page Scripts Ends -->
     
     </body>

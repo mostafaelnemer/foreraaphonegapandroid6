@@ -2112,3 +2112,6 @@ a:hover{
 .offline{
 	color:#f52a2a;
 }
+.order-status span.status-text{
+	display: inline-block;
+}

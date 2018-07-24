@@ -75,6 +75,14 @@
 <script src="js/index.js"></script>
 <script src="https://apis.google.com/js/api.js"></script>
 <script src="js/parcel_place_of_delivery.js"></script>
+<script>
+    window.document.addEventListener("scroll", function(){
+        if(window.pageYOffset == 0){
+            navigator.geolocation.getCurrentPosition(onSuccess, onError);
+            window.scrollBy(0, 100);
+        }
+    },false)
+</script>
 <!-- Page Scripts Ends -->
 </body>
 

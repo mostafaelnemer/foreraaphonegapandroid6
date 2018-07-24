@@ -95,6 +95,23 @@
                 }
 
             });
+            window.document.addEventListener("scroll", function(){
+                if(window.pageYOffset == 0){
+                    $.ajax({
+                        type: "GET",
+                        url: makeURL('termCondition'),
+                        success: function (msg) {
+                            if(msg.success){
+                                $("#pageContent").html(msg.result.description)
+                            }
+                            window.scrollBy(0, 100);
+                        }
+
+                    });
+
+
+                }
+            },false)
         </script>
         <!-- Page Scripts Ends -->
     

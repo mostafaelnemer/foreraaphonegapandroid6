@@ -12,4 +12,9 @@ if(userData){
     $("#userLinkedinData").val(userData.linkedin_link);
     $("#userInstagramData").val(userData.instagram_link);
     $("#userYoutubeData").val(userData.youtube_link);
+    window.document.addEventListener("scroll", function(){
+        if(window.pageYOffset == 0){
+            window.scrollBy(0, 100);
+        }
+    },false)
 }

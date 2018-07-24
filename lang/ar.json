@@ -52,6 +52,7 @@
   "email":"الايميل",
   "open":"مفتوح",
   "new":"جديد",
+  "has_invoice":"له فاتوره",
   "inprogress":"في تَقَدم",
   "canceled":"ألغيت",
   "closed":"أغلقت",
@@ -98,6 +99,16 @@
   "make_online":"تغير الى متصل",
   "make_offline":"تغير الى غير متصل",
   "delegate_position":"موقع المندوب",
+  "failed_you_have_another_order":"لديك طلب اخر",
+  "show_invoice":"عرض الفاتوره",
+  "hide_invoice":"إخفاء الفاتوره",
+  "confirm_invoice":"تأكيد الفاتوره",
+  "enter_your_review_her":"أدخل رأيك هنا...",
+  "please_select_rating":"يرجى اختيار التقيم على الأقل نجمة واحدة",
+  "show_cancel_form":"الغاء",
+  "hide_cancel_form":"تراجع",
+  "your_comment":"تعليقك",
+  "your_phone":"رقم هاتفك",
   "trans_language":"English"
 
 }

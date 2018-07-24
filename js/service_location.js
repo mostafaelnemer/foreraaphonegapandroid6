@@ -59,3 +59,9 @@ if(serviceLocationLatitude&&serviceLocationLongitude&&userDataLatitude&&userData
         $("#cost").html(cost+" $")
     });
 }
+window.document.addEventListener("scroll", function(){
+    if(window.pageYOffset == 0){
+        window.scrollBy(0, 100);
+
+    }
+},false)

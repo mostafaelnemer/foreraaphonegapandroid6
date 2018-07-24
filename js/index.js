@@ -17,7 +17,7 @@ $.getJSON('lang/'+selectedLang+'.json')
     .done(function (data) {
         window.strings = data;
         var strings = data;
-        console.log(data);
+        //console.log(data);
         localStorage.setItem('strings',JSON.stringify(strings));
         includeHTML();
         translate();
@@ -70,13 +70,13 @@ $(document).on('click','#lang', function () {
 });
 function translate(){
 $("[trans-lang-html]").each(function () {
-    console.log($(this).attr('trans-lang-html'));
-    console.log(strings[$(this).attr('trans-lang-html')]);
+    //console.log($(this).attr('trans-lang-html'));
+    //console.log(strings[$(this).attr('trans-lang-html')]);
     $(this).html(strings[$(this).attr('trans-lang-html')]);
     $(this).removeAttr('trans-lang-html')
 })
 $("[trans-lang-placeholder]").each(function () {
-    console.log(strings[$(this).attr('trans-lang-placeholder')]);
+    //console.log(strings[$(this).attr('trans-lang-placeholder')]);
     $(this).attr('placeholder', strings[$(this).attr('trans-lang-placeholder')]);
     $(this).removeAttr('trans-lang-placeholder')
 });
@@ -84,13 +84,28 @@ $("[trans-lang-placeholder]").each(function () {
 
         
 var userData = window.sessionStorage.getItem("userData");
-console.log(userData);
+//console.log(userData);
 if(userData){
-
     userData=JSON.parse(userData);
     user_id=userData.id
     $("#user_id,.user_id").val(user_id);
 }
+var $element = $(".innerpage-section-padding div");
+var lastHeight = $(".innerpage-section-padding div").css('height');
+function checkForChanges()
+{
+    if ($element.css('height') != lastHeight)
+    {
+        windowHeight=$(window).height();
+        elementHeight=$element.height();
+        minHeight=(windowHeight>elementHeight)?windowHeight:elementHeight;
+        $(".innerpage-section-padding").css({"min-height":minHeight+50})
+        lastHeight = $element.css('height');
+    }
+
+    setTimeout(checkForChanges, 500);
+}
+checkForChanges();
 $(".innerpage-section-padding").css({"min-height":$(window).height()+50})
 //console.log(userData);
 url = window.location.pathname;
@@ -178,6 +193,12 @@ function statusIcon(statues) {
         case 'inprogress':
             return 'fa-spinner';
             break;
+        case 'has_invoice':
+            return 'fa-bars';
+            break;
+        case 'confirm_invoice':
+            return 'fa-check-circle';
+            break;
         case 'canceled':
             return 'fa-times-circle'
             break;
@@ -227,41 +248,179 @@ function updateStatusCallback(response) {
         //console.log('you are not authorized and not login');
     }
 }
+// Transaction error callback
+//
+function errorDB(tx, err) {
+    console.log("Error processing SQL: "+err);
+}
+
+// Transaction success callback
+//
+function successDB() {
+    console.log("success!");
+}
 function onDeviceReady() {
-    if ("Notification" in window) {
+    $( ".page-cover" ).after( ' <div style="height:100px;" class="text-center"><img src="img/loading.gif" alt="" style="height: 50px;width:  50px;margin-top:  20px;"></div>' );
+    //console.log(window.location.href);
+    console.log(window.pageYOffset)
+    window.scrollBy(0, 100);
+    var db = window.openDatabase("foreraa_app.db", "1.0", "Foreraa App", 200000);
+    console.log('db');
+    db.transaction(function(tx){
+        query='CREATE TABLE IF NOT EXISTS foreraa_app_user (id unique, username,password)';
+        tx.executeSql(query);
+        query='SELECT * FROM foreraa_app_user WHERE id=?';
+        tx.executeSql(query,[1],function(tx, res){
+            if(res.rows.length){
+                userDataDB=res.rows[0]
+                console.log(userDataDB);
+                if(!userData){
+                    $.ajax({
+                        type: "POST",
+                        url: makeURL('foreraa_users/login'),
+                        data: {"phone":userDataDB.username,"password":userDataDB.password},
+                        success: function (msg) {
+                            $(".loader").hide();
+                            if(msg.success){
+                                window.sessionStorage.setItem("userData", JSON.stringify(msg.result));
+                                window.location.href="map.html";
+                            }
+                        }
+
+                    });
+                }
+
+
+            }
+
+        });
+        //console.log(query);
+    },errorDB,successDB);
+    /*function populateDB(tx) {
+        /!*query='DROP TABLE IF EXISTS DEMO';
+        tx.executeSql(query);
+        console.log(query);
+        query='CREATE TABLE IF NOT EXISTS DEMO (id unique, data)';
+        tx.executeSql(query);
+        console.log(query);
+        query='INSERT INTO DEMO (id, data) VALUES (1, "First row")';
+        tx.executeSql(query);
+        console.log(query);
+        query='INSERT INTO DEMO (id, data) VALUES (2, "Second row")';
+        tx.executeSql(query);
+        console.log(query);*!/
+        query='SELECT * FROM DEMO WHERE id=?';
+        tx.executeSql(query,[1],function(tx, res){
+            console.log(tx);
+            console.log(res);
+            for(var iii = 0; iii < res.rows.length; iii++)
+            {
+                console.log(res.rows.item(iii).id);
+                console.log(res.rows.item(iii).data);
+            }
+        });
+        console.log(query);
+    }
+
+
+    db.transaction(populateDB, errorCB, successCB);*/
+    /*if ("Notification" in window) {
         Notification.requestPermission(function (permission) {
             // If the user accepts, let's create a notification
             if (permission === 'granted') {
-                var notification = new Notification("My title", {
+                /!*cordova.plugins.notification.local.schedule({
+                    title: 'My first notification',
+                    text: 'Thats pretty easy...',
+                    foreground: true
+                });*!/
+                /!*var notification = new Notification("My title", {
                     tag: 'message1',
                     body: "My body"
-                });
-                notification.onshow  = function() { console.log('show'); };
+                });*!/
+                /!*notification.onshow  = function() { console.log('show'); };
                 notification.onclose = function() { console.log('close'); };
-                notification.onclick = function() { console.log('click'); };
+                notification.onclick = function() { console.log('click'); };*!/
             }
         });
+    }*/
+    if ("FirebasePlugin" in window) {
+        /*cordova.plugins.notification.local.schedule({
+            title: 'title',
+            text: 'body',
+            action: 'my-orders.html',
+            foreground: true
+        });*/
+        cordova.plugins.notification.local.on("click", function (notification, state) {
+            console.log('notification');
+            console.log(notification);
+            console.log('state');
+            console.log(state);
+            console.log(notification.id + " was clicked");
+            console.log(notification.action);
+            if(notification.action){
+                window.location.href=notification.action;
+            }
+        }, this)
+        window.FirebasePlugin.getToken(function(token) {
+            // save this server-side and use it to push notifications to this device
+            console.log('getToken');
+            console.log(token);
+            if(userData){
+                $.ajax({
+                    type: "POST",
+                    url: makeURL('foreraa_users/'+userData.id+'/saveToken'),
+                    data: {"firebaseToken":token},
+                    success: function (msg) {
+
+                    }
+                });
+            }
+        }, function(error) {
+            console.log('getToken');
+            console.error(error);
+        });
+        window.FirebasePlugin.onTokenRefresh(function(token) {
+            // save this server-side and use it to push notifications to this device
+            console.log('onTokenRefresh');
+            console.log(token);
+            if(userData){
+                $.ajax({
+                    type: "POST",
+                    url: makeURL('foreraa_users/'+userData.id+'/saveToken'),
+                    data: {"firebaseToken":token},
+                    success: function (msg) {
+
+                    }
+                });
+            }
+        }, function(error) {
+            console.log('onTokenRefresh');
+            console.error(error);
+        });
+        window.FirebasePlugin.onNotificationOpen(function(notificationData) {
+            console.log('notification');
+            console.log(notificationData);
+            /*var notification = new Notification("My title", {
+                tag: 'message1',
+                body: notificationData.body
+            });*/
+            cordova.plugins.notification.local.schedule({
+                title: (notificationData.title)?notificationData.title:'custom title',
+                text: (notificationData.body)?notificationData.body:'custom body',
+                action: (notificationData.action)?notificationData.action:null,
+                foreground: true
+            });
+           // notification.onclick = function() { console.log('click'); };
+        }, function(error) {
+            console.log('notification');
+            console.error(error);
+        });
+        window.FirebasePlugin.hasPermission(function(data){
+            console.log('hasPermission');
+            console.log(data.isEnabled);
+        });
     }
-    cordova.plugins.firebase.messaging.onMessage(function(payload) {
-        console.log("New foreground FCM message: ", payload);
-    });
-    cordova.plugins.firebase.messaging.onBackgroundMessage(function(payload) {
-        console.log("New background FCM message: ", payload);
-    });
-    cordova.plugins.firebase.messaging.requestPermission().then(function(token) {
-        console.log("APNS device token: ", token);
-    });
-    cordova.plugins.firebase.messaging.getToken().then(function(token) {
-        console.log("Got device token: ", token);
-    });
-    cordova.plugins.firebase.messaging.onTokenRefresh(function() {
-        console.log("Device token updated");
-    });
-    cordova.plugins.firebase.messaging.subscribe("New Topic");
-    cordova.plugins.firebase.messaging.unsubscribe("New Topic");
-    cordova.plugins.firebase.messaging.getBadge().then(function(value) {
-        console.log("Badge value: ", value);
-    });
+
 
     if(userData){
         changeData=setInterval(function(){
@@ -294,22 +453,22 @@ function onDeviceReady() {
 
    // console.log("start get location ");
     navigator.geolocation.getCurrentPosition(onSuccess, onError);
-//    cordova.plugins.locationAccuracy.canRequest(function(canRequest){
-//        if(canRequest){
-//            cordova.plugins.locationAccuracy.request(function (success){
-//                //console.log("Successfully requested accuracy: "+success.message);
-//
-//            }, function (error){
-//                //console.error("Accuracy request failed: error code="+error.code+"; error message="+error.message);
-//                if(error.code !== cordova.plugins.locationAccuracy.ERROR_USER_DISAGREED){
-//                    if(window.confirm("Failed to automatically set Location Mode to 'High Accuracy'. Would you like to switch to the Location Settings page and do this manually?")){
-//                        cordova.plugins.diagnostic.switchToLocationSettings();
-//                    }
-//                }
-//            }, cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY);
-//        }
-//    });
+   /*cordova.plugins.locationAccuracy.canRequest(function(canRequest){
+       if(canRequest){
+           cordova.plugins.locationAccuracy.request(function (success){
+               //console.log("Successfully requested accuracy: "+success.message);
 
+           }, function (error){
+               //console.error("Accuracy request failed: error code="+error.code+"; error message="+error.message);
+               if(error.code !==facebookLogin cordova.plugins.locationAccuracy.ERROR_USER_DISAGREED){
+                   if(window.confirm("Failed to automatically set Location Mode to 'High Accuracy'. Would you like to switch to the Location Settings page and do this manually?")){
+                       cordova.plugins.diagnostic.switchToLocationSettings();
+                   }
+               }
+           }, cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY);
+       }
+   });
+*/
     $(document).on('click',"#fb_login",facebookLogin);
     var registerValidator = $("#register-form").validate({
         errorPlacement: function(error, element) {
@@ -547,6 +706,8 @@ function onDeviceReady() {
             //alert('start');
             //$("#charge-btn").attr("disabled", true);
             $(".loader").show();
+            phone=$("#login-form input[name='phone']").val();
+            password=$("#login-form input[name='password']").val();
             $.ajax({
                 type: "POST",
                 url: makeURL('foreraa_users/login'),
@@ -555,14 +716,26 @@ function onDeviceReady() {
                     getMessages(msg,"#response")
                     $(".loader").hide();
                     if(msg.success){
-                        window.sessionStorage.setItem("userData", JSON.stringify(msg.result));
-                        window.location.href="map.html";
+                        db.transaction(function(tx){
+                            console.log('msg.success');
+                            console.log(msg);
+                            tx.executeSql('INSERT INTO foreraa_app_user (id, username,password) VALUES (1, ?,?)',[phone,password]);
+                            window.sessionStorage.setItem("userData", JSON.stringify(msg.result));
+                            window.location.href="map.html";
+                        }, errorDB, successDB);
+
                     }
                 }
 
             });
         }
     });
+    function successHandler(result){
+        console.log("SUCCESS: \r\n"+result );
+    }
+    function errorHandler(result){
+        console.log("ERORR: \r\n"+result );
+    }
     $(".cancel").click(function() {
         loginValidator.resetForm();
     });
@@ -583,6 +756,17 @@ function onDeviceReady() {
 
         });
     })*/
+    //logout
+    $(document).on('click','#logoutMenu',function(e){
+        e.preventDefault();
+        db.transaction(function(tx){
+            query='DELETE FROM foreraa_app_user WHERE id=?';
+            tx.executeSql(query,[1]);
+            window.sessionStorage.removeItem("userData");
+            window.location.href="index.html";
+        });
+
+    });
 }
 
 $(document).on('click','#getMyLocation',function(){
@@ -644,16 +828,18 @@ function saveLocationSession(lastLongitude,lastLatitude){
     window.sessionStorage.setItem("lastLatitude", lastLatitude);
 }
 function sendlatlong(lastLongitude,lastLatitude) {
-    saveLocationSession(lastLongitude,lastLatitude);
-    $.ajax({
-        type: "POST",
-        url: makeURL('foreraa_users/' + userData.id + '/saveLocation'),
-        data: {"lastLongitude": lastLongitude, "lastLatitude": lastLatitude},
-        success: function (msg) {
-            if (msg.success) {
+    if(userData){
+        saveLocationSession(lastLongitude,lastLatitude);
+        $.ajax({
+            type: "POST",
+            url: makeURL('foreraa_users/' + userData.id + '/saveLocation'),
+            data: {"lastLongitude": lastLongitude, "lastLatitude": lastLatitude},
+            success: function (msg) {
+                if (msg.success) {
+                }
             }
-        }
-    });
+        });
+    }
 }
 /*single parcel end code*/
  function onSuccess(position){
@@ -1231,7 +1417,6 @@ $(document).on('click','.confirmOrder',function(e){
     el=$(this);
     order_id=$(this).data('id');
     user_id=userData.id;
-    console.log(userData)
     if(user_id){
         $.ajax({
             type: "POST",
@@ -1248,7 +1433,7 @@ $(document).on('click','.confirmOrder',function(e){
         });
     }
 });
-$(document).on('click','.cancelOrder',function(e){
+/*$(document).on('click','.cancelOrder',function(e){
     e.preventDefault();
     console.log('cancelOrder');
     el=$(this);
@@ -1268,13 +1453,27 @@ $(document).on('click','.cancelOrder',function(e){
             }
         });
     }
-});
-//logout
-$(document).on('click','#logoutMenu',function(e){
+});*/
+$(document).on('submit','#cancelOrderForm',function(e){
     e.preventDefault();
-    window.sessionStorage.removeItem("userData");
-    window.location.href="index.html";
+    if($("#cancelOrderForm #cancel_comment").length){
+        $(".loader").show();
+        user_id=userData.id;
+        $.ajax({
+            type: "POST",
+            url: makeURL('foreraa_users/'+user_id+'/cancelOrder'),
+            data:$("#cancelOrderForm").serialize(),
+            success: function (msg) {
+                if(msg.success){
+                    $("#showCancelForm").parent().remove();
+                    $("#uploadInvoice").parent().remove();
+                }
+                $(".loader").hide();
+            }
+        });
+    }
 });
+
 $(document).on('click','.single-delegate',function(e){
     e.preventDefault();
     delegate_id=$(this).data('id');
@@ -1297,7 +1496,7 @@ $(document).on('click','.chat-now',function(e){
     orderData=window.sessionStorage.getItem("orderData")
     if(orderData){
         orderData=JSON.parse(orderData);
-        if(orderData.id==order_id){
+        if(orderData.order_id==order_id){
             window.location.href="single-order-chats.html";
         }
     }
@@ -1305,7 +1504,7 @@ $(document).on('click','.chat-now',function(e){
 function getChatData(orderData,userData){
     $.ajax({
         type: "GET",
-        url: makeURL('foreraa_orders/'+orderData.id+'/chats'),
+        url: makeURL('foreraa_orders/'+orderData.order_id+'/chats'),
         success: function (msg) {
             console.log(msg);
             if(msg.success){
@@ -1493,6 +1692,49 @@ $(document).on('click','#makeOnline',function(e){
                 $("#delegateStatues").removeClass('online offline').addClass('online')
                 userData.delegateData.status='online';
                 window.sessionStorage.setItem("userData", JSON.stringify(userData));
+            }
+        }
+    });
+});
+
+$(document).on('click','#showInvoiceButton',function(e){
+    e.preventDefault();
+    $(this).html((($(this).html()==strings['show_invoice'])?strings['hide_invoice']:strings['show_invoice']))
+    $('#invoiceImage').toggle();
+});
+$(document).on('click','#showCancelForm',function(e){
+    e.preventDefault();
+    $(this).html((($(this).html()==strings['show_cancel_form'])?strings['hide_cancel_form']:strings['show_cancel_form']))
+    $('#cancelOrderDiv').toggle();
+});
+$(document).on('click','#confirmInvoice',function(e){
+    e.preventDefault();
+    el=$(this);
+    order_id=el.data('id');
+    customer_id=el.attr('data-customer-id');
+    $.ajax({
+        type: "POST",
+        url: makeURL('foreraa_orders/confirmInvoice'),
+        data:{"order_id":order_id,"customer_id":customer_id},
+        success: function (msg) {
+            if(msg.success){
+               el.remove();
+            }
+        }
+    });
+});
+$(document).on('click','#makeClosed',function(e){
+    e.preventDefault();
+    el=$(this);
+    order_id=el.data('id');
+    delegate_id=el.attr('data-delegate-id');
+    $.ajax({
+        type: "POST",
+        url: makeURL('foreraa_orders/makeClosed'),
+        data:{"order_id":order_id,"delegate_id":delegate_id},
+        success: function (msg) {
+            if(msg.success){
+                el.remove();
             }
         }
     });
