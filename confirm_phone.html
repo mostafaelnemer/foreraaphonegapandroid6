@@ -156,23 +156,23 @@
                 <div id="forgot-password-page" >
                     <div class="container-fluid text-center">
                         <div class="innerpage-heading">
-                            <h3 trans-lang-html="forget_password"></h3>
-                            <p trans-lang-html="forget_paragraph"></p>
+                            <h3 trans-lang-html="confirm_phone"></h3>
+                            <p trans-lang-html="confirm_phone_paragraph"></p>
                         </div><!-- end innerpage-heading -->
                         
-                        <form class="custom-form" id="forget-password-form">
+                        <form class="custom-form" id="confirm-code-form">
+                            <div id="response"></div>
                             <div class="form-group">
                                  <div class="input-group">
-                                    <input type="text" id="phone" name="phone" class="form-control" trans-lang-placeholder="your_phone"  required/>
+                                    <input type="text" name="confirm_code" id="confirm_code" class="form-control" trans-lang-placeholder="your_code"  required/>
                                     <span class="input-group-addon"><i class="fa fa-mobile"></i></span>
                                  </div>
                             </div>
-                            <button class="btn btn-orange btn-radius" trans-lang-html="send"></button>
+                            <button class="btn btn-orange btn-radius" trans-lang-html="confirm"></button>
                         </form>
                         
                         <div class="form-page-links">
-                            <p > <span trans-lang-html="have_account"></span><a href="index.html" trans-lang-html="login_now"></a></p>
-                            <p><span  trans-lang-html="new_here"></span>  <a href="register.html" trans-lang-html="register_now"></a></p>
+                            <p ><a href="resend_confirm_code.html" trans-lang-html="resend_confirm_code"></a></p>
                         </div><!-- end form-page-links -->
                         
                     </div><!-- end container-fluid -->
@@ -214,7 +214,7 @@
         <script>
             window.document.addEventListener("scroll", function(){
                 if(window.pageYOffset == 0){
-                    $("#forget-password-form")[0].reset();
+                    $("#confirm-code-form")[0].reset();
                     window.scrollBy(0, 100);
                 }
             },false)

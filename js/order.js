@@ -75,10 +75,10 @@ if(userData.type=='delegate'&&!orderData){
                         delegateHtml+='<div class="col-lg-12"><button class="confirmOrder btn btn-info btn-block" data-id="'+orderData.order_id+'">'+strings['confirm']+'</button></div>'
                     }
                     if(orderData.statues=='inprogress'){
-                        delegateHtml+='<div class="col-lg-12"><button id="uploadInvoice" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'">'+strings['create_invoice']+'</button></div>'
+                        delegateHtml+='<div class="col-lg-12"><button id="uploadInvoice" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['create_invoice']+'"><i class="fa fa-window-maximize"></i></button></div>'
                     }
                     if(orderData.statues=='confirm_invoice'){
-                        delegateHtml+='<div class="col-lg-12"><button id="makeClosed" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'">'+strings['closed']+'</button></div>'
+                        delegateHtml+='<div class="col-lg-12"><button id="makeClosed" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['closed']+'"><i class="fa fa-check-circle"></i></button></div>'
                     }
                     if(orderData.has_customer_rating==0&&orderData.statues=='closed'){
                         delegateHtml+='<div class="clearfix"></div><div class="clearfix" style="height: 10px;"></div><div class="col-md-12"><form id="ratingCustomerForm" action="" method="post"><div id="ratingCustomerForm-response"></div> <input type="hidden" name="user_id" value="'+orderData.user_id+'"> <input type="hidden" name="delegate_id" value="'+orderData.delegate_id+'"> <input type="hidden" id="order_id" name="order_id" value="'+orderData.order_id+'"> <input id="ratings-hidden" name="rating" type="hidden"> <div class="form-group"><textarea class="form-control animated" cols="50" id="new-review" name="comment" placeholder="'+strings['enter_your_review_her']+'" rows="5"></textarea></div>  <div class="text-right"> <div class="stars starrr" data-rating="0"></div> <button class="btn btn-success btn-lg" type="submit">'+strings['save']+'</button></div></form></div>';

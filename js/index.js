@@ -448,6 +448,12 @@ function onDeviceReady() {
             $("#serviceMenu").addClass('hidden');
         }
 
+    }else{
+        changeData=setInterval(function() {
+            if($("#userImage").length) {
+                $("#serviceMenu,#complaintsMenu,#myOrdersMenu,#myAccountMenu").addClass('hidden');
+            }
+        },300);
     }
     //console.log('Device Is Ready');
 
@@ -513,6 +519,9 @@ function onDeviceReady() {
                 required:true,
                 minlength : 5,
                 equalTo:"#password"
+            },
+            term_condition : {
+                required:true,
             }
         },
         messages: {
@@ -530,6 +539,166 @@ function onDeviceReady() {
                     if(msg.success){
                         $("#register-form #social").val('no');
                         $("#register-form")[0].reset();
+                        window.location.href="confirm_phone.html";
+                    }
+                    $(".loader").hide();
+                }
+            });
+        }
+    });
+    $(".cancel").click(function() {
+        registerValidator.resetForm();
+    });
+    var registerValidator = $("#forget-password-form").validate({
+        errorPlacement: function(error, element) {
+            // Append error within linked label
+            /*$( element )
+                .closest( "form" )
+                .find( "label[for='" + element.attr( "id" ) + "']" )
+                .append( error );*/
+            //$(element).parent().parent().addClass('has-error');
+
+        },
+        highlight: function(element) {
+
+            $(element).closest('.form-group').addClass('has-error');
+
+        },
+        unhighlight: function(element) {
+
+            $(element).closest('.form-group').removeClass('has-error');
+
+        },
+        errorElement: "span",
+        rules : {
+
+            phone : {
+                required:true,
+                minlength : 5
+            }
+        },
+        messages: {
+        },
+        submitHandler: function() {
+            //alert('start');
+            //$("#charge-btn").attr("disabled", true);
+            $(".loader").show();
+            $.ajax({
+                type: "POST",
+                url: makeURL('foreraa_users/forgetPassword'),
+                data: $("#forget-password-form").serialize(),
+                success: function (msg) {
+                    getMessages(msg,"#response")
+                    if(msg.success){
+
+                    }
+                    $(".loader").hide();
+                }
+            });
+        }
+    });
+    $(".cancel").click(function() {
+        registerValidator.resetForm();
+    });
+    var registerValidator = $("#confirm-code-form").validate({
+        errorPlacement: function(error, element) {
+            // Append error within linked label
+            /*$( element )
+                .closest( "form" )
+                .find( "label[for='" + element.attr( "id" ) + "']" )
+                .append( error );*/
+            //$(element).parent().parent().addClass('has-error');
+
+        },
+        highlight: function(element) {
+
+            $(element).closest('.form-group').addClass('has-error');
+
+        },
+        unhighlight: function(element) {
+
+            $(element).closest('.form-group').removeClass('has-error');
+
+        },
+        errorElement: "span",
+        rules : {
+
+            confirm_code : {
+                required:true,
+                minlength : 5
+            },
+        },
+        messages: {
+        },
+        submitHandler: function() {
+            //alert('start');
+            //$("#charge-btn").attr("disabled", true);
+            $(".loader").show();
+            code=$("#confirm_code").val();
+            $.ajax({
+                type: "POST",
+                url: makeURL('foreraa_users/ActiveByCode/'+code),
+                data: $("#confirm-code-form").serialize(),
+                success: function (msg) {
+                    getMessages(msg,"#response")
+                    if(msg.success){
+                        setTimeout(function(){
+                            window.location.href="index.html";
+                        },3000)
+                    }
+                    $(".loader").hide();
+                }
+            });
+        }
+    });
+    $(".cancel").click(function() {
+        registerValidator.resetForm();
+    });
+    var registerValidator = $("#resend-code-form").validate({
+        errorPlacement: function(error, element) {
+            // Append error within linked label
+            /*$( element )
+                .closest( "form" )
+                .find( "label[for='" + element.attr( "id" ) + "']" )
+                .append( error );*/
+            //$(element).parent().parent().addClass('has-error');
+
+        },
+        highlight: function(element) {
+
+            $(element).closest('.form-group').addClass('has-error');
+
+        },
+        unhighlight: function(element) {
+
+            $(element).closest('.form-group').removeClass('has-error');
+
+        },
+        errorElement: "span",
+        rules : {
+
+            phone : {
+                required:true,
+                minlength : 5
+            },
+        },
+        messages: {
+        },
+        submitHandler: function() {
+            //alert('start');
+            //$("#charge-btn").attr("disabled", true);
+            $(".loader").show();
+            code=$("#confirm_code").val();
+            $.ajax({
+                type: "POST",
+                url: makeURL('foreraa_users/resendCode'),
+                data: $("#resend-code-form").serialize(),
+                success: function (msg) {
+                    getMessages(msg,"#response")
+                    if(msg.success){
+                        setTimeout(function(){
+                            window.location.href="confirm_phone.html";
+                        },3000)
                     }
                     $(".loader").hide();
                 }
@@ -1510,17 +1679,20 @@ function getChatData(orderData,userData){
             if(msg.success){
                 html='';
                 if(userData.type=='customer'){
-                    html+='<li class="right clearfix "> <span class="chat-img1 pull-left"> <img src="img/logoo.png" alt="forera" class="img-circle"> </span> <div class="chat-body1 clearfix"><p>'+strings['chat']+'</p>  </div> </li>';
+                    html+='<li class="right clearfix "> <span class="chat-img1 pull-left"> <img src="img/logoo.png" alt="forera" class="img-circle"> </span> <div class="chat-body1 clearfix"><p>'+strings['customer_chat']+'</p>  </div> </li>';
                 }
-
+                if(userData.type=='delegate'){
+                    html+='<li class="right clearfix "> <span class="chat-img1 pull-left"> <img src="img/logoo.png" alt="forera" class="img-circle"> </span> <div class="chat-body1 clearfix"><p>'+strings['delegate_chat']+'</p>  </div> </li>';
+                }
                 if(msg.result.length){
                     msg.result.forEach(function (item) {
                         html+='<li class="left clearfix '+((userData.id==item.user_id)?'admin_chat':'')+'"> <span class="chat-img1 '+((userData.id==item.user_id)?'pull-right':'pull-left')+'"> <img src="'+item.image+'" alt="'+item.user_name+'" class="img-circle"> </span> <div class="chat-body1 clearfix"><p><!--<span class="username label '+((userData.id==item.user_id)?'label-info':'label-success')+'">'+item.user_name+'</span>--> '+item.message+'</p> <div class="chat_time '+((userData.id==item.user_id)?'pull-left':'pull-right')+'">'+formatDate(new Date(item.add_date))+' '+formatTime(new Date(item.add_date))+'</div> </div> </li>';
                     });
                 }else{
                     //html='<div id="noData" class="text-center">No Messages</div>';
-                    html='<li id="noMessageDiv" class="left clearfix"><div class="chat-body1 clearfix" style="margin: 0;"><p class="text-center">No Message</p></div></li>';
+                    html+='<li id="noMessageDiv" class="left clearfix"><div class="chat-body1 clearfix" style="margin: 0;"><p class="text-center">No Message</p></div></li>';
                 }
+                console.log(html);
                 $(".chat_area ul.list-unstyled").html(html);
             }
         }
