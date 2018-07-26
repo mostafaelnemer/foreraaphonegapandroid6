@@ -123,5 +123,12 @@
     "failed_already_confirmed":"already confirmed",
     "failed_phone_not_exist":"phone not exist",
     "success_send_sms":"Success Send SMS",
+    "enter_customer":"Enter Customer",
+    "enter_delegate":"Enter Delegate",
+    "forget_password_quetion":"Forget password ?",
+    "register_customer":"Customer Register",
+    "register_delegate":"Delegate Register",
+    "how_the_app_work":"How the APP works",
+    "delivery_time":"Delivery Time",
     "trans_language":"العربية"
 }

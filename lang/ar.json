@@ -1,6 +1,6 @@
 {
   "login" : "تسجيل دخول ",
-  "login_to_start_add_your_orders" : "سجل دخول لاضافه طلباتك",
+  "login_to_start_add_your_orders" : "سجل دخولك على تطبيق Foreraa",
   "register_now" : "سجل الان",
   "new_here" : "جديد هنا ؟",
   "password" : "كلمه السر",
@@ -33,7 +33,7 @@
   "save" : "حفظ",
   "no_order" : "لا توجد طلبات",
   "order_id" : "رقم الطلب:",
-  "home-page" : "الصفحه الرئيسيه",
+  "home-page" : "الرئيسية",
   "complaints" : "شكاوى",
   "logout":"تسجيل خروج",
   "search_place" : "بحث عن مكان",
@@ -83,7 +83,7 @@
   "failed_you_have_another_order.":"لديك طلب آخر",
   "create_invoice":"اضافة فتوره",
   "delegate_ratings":"التقيمات",
-  "my_account":"حسابى",
+  "my_account":"معلوماتى",
   "edit_profile":"تعديل الحساب",
   "phone":"رقم الهاتف",
   "facebook_link":"فيس بوك",
@@ -123,6 +123,13 @@
   "failed_already_confirmed":"تم تأكيد هذا الهاتف من قبل",
   "failed_phone_not_exist":"الهاتف غير موجود",
   "success_send_sms":"تم ارسال الرساله بنجاح",
+  "enter_customer":"دخول عميل",
+  "enter_delegate":"دخول كابتن",
+  "forget_password_quetion":"نسيه كلمة المرور؟",
+  "register_customer":"تسجيل عميل",
+  "register_delegate":"تسجيل كابتن",
+  "how_the_app_work":"طريقة عمل البرنامج",
+  "delivery_time":"ميعاد التوصيل المناسب",
   "trans_language":"English"
 
 }

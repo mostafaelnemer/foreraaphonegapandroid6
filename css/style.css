@@ -67,7 +67,7 @@ p,ul{
 }
 
 p{
-	color:#737373;
+	color:#dcdada;
 }
 
 ul{
@@ -1198,7 +1198,7 @@ a:hover{
 .custom-form label{
 	font-weight:normal;
 	font-size:13px;
-	color:#737373;
+	color:#dcdada;
 	line-height:1.5em;
 }
 
@@ -2114,4 +2114,7 @@ a:hover{
 }
 .order-status span.status-text{
 	display: inline-block;
+}
+a.btn-orange{
+    color:#FFFFFF!important;
 }

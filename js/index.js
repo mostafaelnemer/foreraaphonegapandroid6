@@ -1412,6 +1412,9 @@ var serviceOrderValidator = $("#service-order-form").validate({
         distance : {
             required:true,
             minlength : 5,
+        },
+        delivery_time : {
+            required:true,
         }
     },
     messages: {
@@ -1910,4 +1913,10 @@ $(document).on('click','#makeClosed',function(e){
             }
         }
     });
+});
+//login page
+$(document).on('change','input[name="type"]',function(e){
+    val=$(this).val();
+    $(".type-icon").removeClass('fa-arrow-right');
+    $("#label-"+val+" .type-icon").addClass('fa-arrow-right')
 });
