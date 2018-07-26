@@ -130,6 +130,8 @@
   "register_delegate":"تسجيل كابتن",
   "how_the_app_work":"طريقة عمل البرنامج",
   "delivery_time":"ميعاد التوصيل المناسب",
+  "failed_you_balance_great_than_limit":"الحساب لديك تعدى الحد الاقصى",
+  "you_cant_cancel_this_order_5":"لا يمكنك الغاء الطلب لتعدى الفتره المسموحه للالغاء",
   "trans_language":"English"
 
 }

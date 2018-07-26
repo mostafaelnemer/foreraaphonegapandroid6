@@ -25,7 +25,7 @@ window.document.addEventListener("scroll", function(){
                         html+='<li><a href="javascript:void(0)" data-id="'+item.id+'" data-json=\''+JSON.stringify(item)+'\' class="single-service"><span><i class="fullscr-nav-icon fas '+item.icon+'"></i></span>'+item.name+'</a><span class="border-shape"></span></li>';
                     });
                     $(".fullscr-navigation.position-initial ul.list-unstyled").html(html);
-                    window.scrollBy(0, 100);
+                    window.scrollBy(0, 60);
                 }
             }
 

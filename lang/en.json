@@ -130,5 +130,7 @@
     "register_delegate":"Delegate Register",
     "how_the_app_work":"How the APP works",
     "delivery_time":"Delivery Time",
+    "failed_you_balance_great_than_limit":"you balance great than limit",
+    "you_cant_cancel_this_order_5":"you can't cancel this order",
     "trans_language":"العربية"
 }

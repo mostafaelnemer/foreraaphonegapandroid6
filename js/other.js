@@ -7,7 +7,7 @@ if(serviceData){
         window.document.addEventListener("scroll", function(){
             if(window.pageYOffset == 0){
                 serviceSearchOnGoogleMap(serviceData);
-                window.scrollBy(0, 100);
+                window.scrollBy(0, 60);
 
             }
         },false)
@@ -48,7 +48,7 @@ if(serviceData){
                             if(msg.result.type=='service'){
                                 window.sessionStorage.setItem("serviceData", JSON.stringify(msg.result));
                                 serviceSearchOnGoogleMap(JSON.stringify(msg.result));
-                                window.scrollBy(0, 100);
+                                window.scrollBy(0, 60);
                             }else{
                                 window.location.href="services.html";
                             }

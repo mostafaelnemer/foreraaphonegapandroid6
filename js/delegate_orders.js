@@ -38,7 +38,7 @@ if(userData){
                             html+='<a href="javascript:void(0)" data-id="'+item.order_id+'" class="single-delegate-order"><div class="panel panel-default order-panel"> <div class="panel-heading"> <div class="order-title"> <div class="order-name pull-left"> <h3 class="panel-title"><span>Order ID:</span> #'+item.id+'</h3> <ul class="list-inline"> <li><i class="fa fa-calendar-alt"></i>'+formatDate(add_date)+'</li> <li><i class="fa fa-clock"></i>'+formatTime(add_date)+'</li> </ul> </div> <span class="order-status success pull-right"><i class="fa '+statusIcon(item.statues)+'"></i><span class="status-text"> '+strings[item.statues]+'</span></span> </div> </div><!-- end panel-heading --> </div></a>'
                         });
                         $("#my_orders").html(html)
-                        window.scrollBy(0, 100);
+                        window.scrollBy(0, 60);
                     }
                 }
 

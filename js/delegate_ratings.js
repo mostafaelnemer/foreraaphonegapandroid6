@@ -59,7 +59,7 @@ if(userData){
                             }
 
                             $("#delegate_ratings").html(html)
-                            window.scrollBy(0, 100);
+                            window.scrollBy(0, 60);
                         }
                     }
                 });

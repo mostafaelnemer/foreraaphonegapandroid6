@@ -41,7 +41,7 @@ if(delegateData){
                         $("#delegateTitleName,#delegateName").html(delegateData.name);
                         $("#delegatePhone").html(delegateData.phone);
                         $("#delegateOrders").html(delegateData.orders);
-                        window.scrollBy(0, 100);
+                        window.scrollBy(0, 60);
                     }
                 }
             });

@@ -81,9 +81,27 @@ $("[trans-lang-placeholder]").each(function () {
     $(this).removeAttr('trans-lang-placeholder')
 });
 }
+$(document).ready(function(){
+    $.ajax({
+        type: "GET",
+        url: makeURL('appSettings'),
+        success: function (msg) {
+            if(msg.success){
+                window.sessionStorage.setItem("appSettings", JSON.stringify(msg.result));
+                $("#youtube_link").attr('href',msg.result.youtube_link);
+            }
+        }
+    });
+});
 
         
 var userData = window.sessionStorage.getItem("userData");
+var appSettings= window.sessionStorage.getItem("appSettings");
+if(appSettings){
+    appSettings=JSON.parse(appSettings);
+    console.log(appSettings)
+    $("#youtube_link").attr('href',appSettings.youtube_link);
+}
 //console.log(userData);
 if(userData){
     userData=JSON.parse(userData);
@@ -259,11 +277,14 @@ function errorDB(tx, err) {
 function successDB() {
     console.log("success!");
 }
+
 function onDeviceReady() {
-    $( ".page-cover" ).after( ' <div style="height:100px;" class="text-center"><img src="img/loading.gif" alt="" style="height: 50px;width:  50px;margin-top:  20px;"></div>' );
+
+
+    $( ".page-cover" ).after( ' <div style="height:60px;" class="text-center"><img src="img/loading.gif" alt="" style="height: 35px;width:  35px;margin-top:  20px;"></div>' );
     //console.log(window.location.href);
     console.log(window.pageYOffset)
-    window.scrollBy(0, 100);
+    window.scrollBy(0, 60);
     var db = window.openDatabase("foreraa_app.db", "1.0", "Foreraa App", 200000);
     console.log('db');
     db.transaction(function(tx){

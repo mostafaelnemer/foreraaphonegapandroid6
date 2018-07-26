@@ -51,7 +51,7 @@ if(userData){
                             }
 
                             $("#my_orders").html(html)
-                            window.scrollBy(0, 100);
+                            window.scrollBy(0, 60);
                         }
                     }
 
@@ -103,7 +103,7 @@ if(userData){
                                 html+='<div class="panel panel-default order-panel"> <div class="panel-heading"> <div class="order-title"> <div class="order-name"> <h3 class="panel-title text-center"><span>'+no_order+'</h3>  </div>  </div> </div><!-- end panel-heading --> </div>'
                             }
                             $("#my_orders").html(html)
-                            window.scrollBy(0, 100);
+                            window.scrollBy(0, 60);
                         }
                     }
 

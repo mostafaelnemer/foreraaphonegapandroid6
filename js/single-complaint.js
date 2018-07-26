@@ -20,7 +20,7 @@ if(complaintData){
                         complaintData=msg.result;
                         $("#complaint-title").html('Complaint Number #'+complaintData.id);
                         $("#complaint-details").html(complaintData.complaint);
-                        window.scrollBy(0, 100);
+                        window.scrollBy(0, 60);
                     }
 
                 }

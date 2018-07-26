@@ -46,7 +46,7 @@ if(userData){
                         }
 
                         $("#my_orders").html(html)
-                        window.scrollBy(0, 100);
+                        window.scrollBy(0, 60);
                     }
                 }
 

@@ -481,7 +481,7 @@ if(userData.type=='delegate'&&!orderData){
             initMap();
             window.document.addEventListener("scroll", function(){
                 if(window.pageYOffset == 0){
-                    window.scrollBy(0, 100);
+                    window.scrollBy(0, 60);
                     user_id=userData.id;
                     order_id=orderData.id;
                     if(userData.type=='customer'){
@@ -495,7 +495,7 @@ if(userData.type=='delegate'&&!orderData){
                                         orderData=msg.result;
                                         orderDataHTML(orderData,userData);
                                         initMap();
-                                        window.scrollBy(0, 100);
+                                        window.scrollBy(0, 60);
                                     }
 
                                 }
@@ -511,7 +511,7 @@ if(userData.type=='delegate'&&!orderData){
                                     orderData=msg.result;
                                     orderDataHTML(orderData,userData);
                                     initMap();
-                                    window.scrollBy(0, 100);
+                                    window.scrollBy(0, 60);
                                 }
 
                             }
