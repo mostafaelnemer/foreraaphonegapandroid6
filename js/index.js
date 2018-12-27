@@ -7,6 +7,8 @@ window.sessionStorage.clear();//Clear storage
 */
 //  window.sessionStorage.clear();\
 /*start lang js file*/
+url = window.location.pathname;
+var filename = url.substring(url.lastIndexOf('/')+1);
 var selectedLang=(localStorage.getItem("lang")=='ar'||localStorage.getItem("lang")=='en')?localStorage.getItem("lang"):'en';
 if(selectedLang=='ar'){
     $('head').append('<link rel="stylesheet" href="css/rtl.css" type="text/css" />');
@@ -68,6 +70,471 @@ $(document).on('click','#lang', function () {
     location.reload();
 
 });
+function orderDataHTML(orderData,userData){
+    $("#order-title").html(strings['order_number']+' #'+orderData.order_id);
+    $("#order_place_of_delivery").removeAttr('trans-lang-html').html('<span class="pull-right"><i class="fa fa-map-marker"></i></span> '+orderData.place_of_delivery_address);
+    $("#order_delivery_place").removeAttr('trans-lang-html').html('<span class="pull-right"><i class="fa fa-map-marker"></i></span> '+orderData.delivery_place_address);
+    $("#order_details").val(orderData.details)
+    $("#distance").html(orderData.distance)
+    $("#duration").html(orderData.duration)
+    $("#cost").html(orderData.cost);
+    //$("#order-image").attr('src',orderData.cost);
+    orderImages='';
+    orderData.foreraa_order_images.forEach(function(item){
+        orderImages+=' <img class="order-image" data-title="'+strings['order_number']+' #'+item.order_id+'" src="'+SITEURL+item.img_dir+item.img+'" alt="">'
+    });
+    $("#orderImageDiv").html(orderImages);
+    delegateHtml='';
+    delegateHtml+='<div class="clearfix"></div>';
+    delegateHtml+='<div class="clearfix"></div>';
+    console.log(orderData.statues);
+    console.log(userData);
+    if(userData.type=='customer'){
+        if(orderData.delegate_id){
+            delegateHtml+='<div class="hr-border"></div><div class="clearfix"></div><div class="delegate-section"><div class="col-xs-3"><a href="#" class="single-delegate" data-id="'+orderData.delegate_id+'"><img style="width: 100%" src="'+((orderData.delegate_img_dir&&orderData.delegate_img)?SITEURL+orderData.delegate_img_dir+orderData.delegate_img:SITEURL+'img/Users/default_image.png')+'" class="img-circle" alt=""></a></div> <div class="col-xs-9"><a href="#" data-order-id="'+orderData.order_id+'" class="pull-right chat-now"><i class="fa fa-commenting"></i></a><a class="pull-right call-now" href="tel:'+orderData.delegate_phone+'"><i class="fa fa-phone"></i></a> <a href="#" class="single-delegate" data-id="'+orderData.delegate_id+'"><h4>'+orderData.delegate_name+'</h4></a> <ul class="list-unstyled list-inline star-rating"> ';
+            for(x=1;x<=orderData.delegate_rating;x++){
+                delegateHtml+='<li><span><i class="fa fa-star"></i></span></li>';
+            }
+            for(y=x;y<=5;y++){
+                delegateHtml+='<li><span><i class="fa fa-star-o"></i></span></li>';
+            }
+            delegateHtml+='</ul> <a href="#" class="single-delegate" data-id="'+orderData.delegate_id+'">'+strings['view']+'</a> </div><div class="clearfix"></div></div>';
+        }else{
+            delegateHtml='<div class="clearfix"></div><div class="alert alert-info"><i class="fa fa-times-circle"></i> No Delegate</div>';
+        }
+        if(orderData.has_delegate_rating==0&&orderData.statues=='closed'){
+            delegateHtml+='<div class="clearfix"></div><div class="clearfix" style="height: 10px;"></div><div class="col-md-12"><form id="ratingDelegateForm" action="" method="post"><div id="ratingDelegateForm-response"></div> <input type="hidden" name="user_id" value="'+orderData.user_id+'"> <input type="hidden" name="delegate_id" value="'+orderData.delegate_id+'"> <input type="hidden" id="order_id" name="order_id" value="'+orderData.order_id+'"> <input id="ratings-hidden" name="rating" type="hidden"> <div class="form-group"><textarea class="form-control animated" cols="50" id="new-review" name="comment" placeholder="'+strings['enter_your_review_her']+'" rows="5"></textarea></div>  <div class="text-right"> <div class="stars starrr" data-rating="0"></div> <button class="btn btn-success btn-lg" type="submit">'+strings['save']+'</button></div></form></div>';
+        }
+        /*if((userData.id==orderData.user_id||(orderData.delegate_id&&orderData.delegate_id==userData.id))&&$.inArray(orderData.statues,['cancel'])!=-1){
+            delegateHtml+='<div class="col-lg-12"><button class="cancelOrder btn btn-info btn-block" data-id="'+orderData.order_id+'">'+strings['cancel']+'</button></div>'
+        }*/
+        if(orderData.statues=='has_invoice'){
+            delegateHtml+='<div class="col-lg-12"><button id="confirmInvoice" class=" btn btn-info btn-block" data-customer-id="'+userData.id+'" data-id="'+orderData.order_id+'">'+strings['confirm_invoice']+'</button></div>'
+        }
+
+    }else{
+
+        delegateHtml+='<div class="hr-border"></div><div class="clearfix"></div><div class="customer-section"><div class="col-xs-3"><img style="width: 100%" src="'+((orderData.user_img_dir&&orderData.user_img)?SITEURL+orderData.user_img_dir+orderData.user_img:SITEURL+'img/Users/default_image.png')+'" class="img-circle" alt=""></div>';
+        delegateHtml+='<div class="col-xs-9"><a href="#" data-order-id="'+orderData.order_id+'" class="pull-right chat-now"><i class="fa fa-commenting"></i></a><a class="pull-right call-now" href="tel:'+orderData.user_phone+'"><i class="fa fa-phone"></i></a> <h4>'+orderData.user_name+'</h4></div><div class="clearfix"></div></div>';
+        if(orderData.statues=='new'){
+            delegateHtml+='<div class="col-lg-12"><button class="confirmOrder btn btn-info btn-block" data-id="'+orderData.order_id+'">'+strings['confirm']+'</button></div>'
+        }
+        if(orderData.statues=='inprogress'){
+            //delegateHtml+='<div class="col-lg-12"><button id="uploadInvoice" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['create_invoice']+'">'+strings['create_invoice']+'</div>'
+            delegateHtml+='<div class="col-lg-12" id="uploadInvoiceDiv"> <h3>'+strings['invoice']+'</h3><div class="col-lg-6 col-xs-6 col-md-6"><button id="uploadInvoiceGallery" class="btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['gallery']+'">'+strings['gallery']+'</button></div><div class="col-lg-6 col-xs-6 col-md-6"><button id="uploadInvoiceCamera" class="btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['camera']+'">'+strings['camera']+'</button></div></div>'
+        }
+        if(orderData.statues=='confirm_invoice'){
+            delegateHtml+='<div class="col-lg-12"><button id="makeClosed" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['closed_order']+'">'+strings['closed_order']+'</button></div>'
+        }
+        if(orderData.has_customer_rating==0&&orderData.statues=='closed'){
+            delegateHtml+='<div class="clearfix"></div><div class="clearfix" style="height: 10px;"></div><div class="col-md-12"><form id="ratingCustomerForm" action="" method="post"><div id="ratingCustomerForm-response"></div> <input type="hidden" name="user_id" value="'+orderData.user_id+'"> <input type="hidden" name="delegate_id" value="'+orderData.delegate_id+'"> <input type="hidden" id="order_id" name="order_id" value="'+orderData.order_id+'"> <input id="ratings-hidden" name="rating" type="hidden"> <div class="form-group"><textarea class="form-control animated" cols="50" id="new-review" name="comment" placeholder="'+strings['enter_your_review_her']+'" rows="5"></textarea></div>  <div class="text-right"> <div class="stars starrr" data-rating="0"></div> <button class="btn btn-success btn-lg" type="submit">'+strings['save']+'</button></div></form></div>';
+        }
+
+
+    }
+
+    delegateHtml+='<div class="clearfix" style="height: 20px;"></div>';
+    if(orderData.statues=='has_invoice'||orderData.statues=='confirm_invoice'||orderData.statues=='closed'){
+        delegateHtml+='<div class="col-lg-12"><button id="showInvoiceButton" class=" btn btn-info btn-block">'+strings['show_invoice']+'</button><div class="clearfix"></div><div id="invoiceImage" style="display: none;"><img class="order-image" data-title="'+strings['order_number']+' #'+orderData.order_id+'" style="width:100%;" src="'+SITEURL+orderData.invoice_img_dir+orderData.invoice_img+'"></div></div>';
+    }
+    delegateHtml+='<div class="clearfix" style="height: 20px;"></div>';
+    /*if($.inArray( orderData.statues, ['confirm_invoice','closed','has_invoice'] )==-1){
+        delegateHtml+='<div class="col-lg-12"><button id="cancel" class=" btn btn-info btn-block">'+strings['cancel']+'</button></div>';
+    }*/
+    if($.inArray(orderData.statues,['canceled','closed','confirm_invoice','has_invoice'])==-1&&(userData.id==orderData.delegate_id||userData.id==orderData.user_id)){
+        delegateHtml+='<div class="col-lg-12"><div class="col-lg-12"><button id="showCancelForm" class="btn btn-info btn-block" data-id="'+orderData.order_id+'">'+strings['show_cancel_form']+'</button><div class="clearfix"></div><div id="cancelOrderDiv" style="display: none;">  <form id="cancelOrderForm" action="" method="post"><input type="hidden" name="current_user_id" value="'+userData.id+'"><input type="hidden" name="order_id" value="'+orderData.order_id+'"><div class="form-group"><textarea class="form-control animated" cols="50" id="cancel_comment" name="cancel_comment" placeholder="'+strings['your_comment']+'" rows="5"></textarea></div> <button class="btn btn-success btn-lg" type="submit">'+strings['cancel']+'</button></form></div></div></div>'
+    }
+
+
+    delegateHtml+='<div class="clearfix"></div>';
+    delegateHtml+='<div class="clearfix"></div>';
+    $("#delegate-content").html(delegateHtml);
+    if(orderData.has_delegate_rating==0&&orderData.statues=='closed'){
+        var ratingDelegateForm = $("#ratingDelegateForm").validate({
+            errorPlacement: function(error, element) {
+                // Append error within linked label
+                /*$( element )
+                    .closest( "form" )
+                    .find( "label[for='" + element.attr( "id" ) + "']" )
+                    .append( error );*/
+                //$(element).parent().parent().addClass('has-error');
+
+            },
+            highlight: function(element) {
+                //console.log("highlight:");
+                //console.log(element);
+                $(element).closest('.form-group').addClass('has-error');
+
+
+            },
+            unhighlight: function(element) {
+                //console.log("unhighlight:");
+                //console.log(element);
+                $(element).closest('.form-group').removeClass('has-error');
+            },
+            errorElement: "span",
+            rules : {
+
+                comment : {
+                    required:true,
+                    minlength : 5
+                },
+            },
+            messages: {
+            },
+            submitHandler: function() {
+                //alert('start');
+                //$("#charge-btn").attr("disabled", true);
+                $(".loader").show();
+                $("#ratingDelegateForm-response").html('');
+                if($("#ratings-hidden").val()){
+                    $.ajax({
+                        type: "POST",
+                        url: makeURL('foreraa_users/'+orderData.delegate_id+'/ratingDelegate'),
+                        data:$("#ratingDelegateForm").serialize(),
+                        success: function (msg) {
+                            getMessages(msg,"#ratingDelegateForm-response")
+                            if(msg.success){
+                                $("#ratingDelegateForm")[0].reset();
+                                $("#ratingDelegateForm input").remove();
+                                $("#ratingDelegateForm textarea").remove();
+                                $("#ratingCustomerForm .stars.starrr").remove();
+                                $("#ratingCustomerForm .btn.btn-success.btn-lg").remove();
+                                window.location.href="map.html";
+                            }
+                        }
+                    });
+                }else{
+                    $("#ratingDelegateForm-response").html('<div class="alert alert-danger">Please Select Rating At Less One Star</div>')
+                }
+                $(".loader").hide();
+
+            }
+        });
+    }
+    if(orderData.has_customer_rating==0&&orderData.statues=='closed'){
+        var ratingCustomerForm = $("#ratingCustomerForm").validate({
+            errorPlacement: function(error, element) {
+                // Append error within linked label
+                /*$( element )
+                    .closest( "form" )
+                    .find( "label[for='" + element.attr( "id" ) + "']" )
+                    .append( error );*/
+                //$(element).parent().parent().addClass('has-error');
+
+            },
+            highlight: function(element) {
+                //console.log("highlight:");
+                //console.log(element);
+                $(element).closest('.form-group').addClass('has-error');
+
+
+            },
+            unhighlight: function(element) {
+                //console.log("unhighlight:");
+                //console.log(element);
+                $(element).closest('.form-group').removeClass('has-error');
+            },
+            errorElement: "span",
+            rules : {
+
+                comment : {
+                    required:true,
+                    minlength : 5
+                },
+            },
+            messages: {
+            },
+            submitHandler: function() {
+                //alert('start');
+                //$("#charge-btn").attr("disabled", true);
+                $(".loader").show();
+                $("#ratingCustomerForm-response").html('');
+                if($("#ratings-hidden").val()){
+                    $.ajax({
+                        type: "POST",
+                        url: makeURL('foreraa_users/'+orderData.user_id+'/ratingCustomer'),
+                        data:$("#ratingCustomerForm").serialize(),
+                        success: function (msg) {
+                            getMessages(msg,"#ratingCustomerForm-response")
+                            if(msg.success){
+                                $("#ratingCustomerForm")[0].reset();
+                                $("#ratingCustomerForm input").remove();
+                                $("#ratingCustomerForm textarea").remove();
+                                $("#ratingCustomerForm .stars.starrr").remove();
+                                $("#ratingCustomerForm .btn.btn-success.btn-lg").remove();
+                                window.location.href="map.html";
+                            }
+                        }
+                    });
+                }else{
+                    $("#ratingCustomerForm-response").html('<div class="alert alert-danger">'+strings['please_select_rating']+'</div>')
+                }
+                $(".loader").hide();
+
+            }
+        });
+    }
+}
+function initMap() {
+    var orderData = window.sessionStorage.getItem("orderData");
+    if(orderData){
+        orderData=JSON.parse(orderData);
+    }
+    var markers=[];
+    var directionsService = new google.maps.DirectionsService;
+    // var places = new google.maps.places.PlacesService(map);
+    var infowindow = new google.maps.InfoWindow();
+    var map = new google.maps.Map(document.getElementById('order-map'), {
+        zoom: 50,
+        center: new google.maps.LatLng(orderData.place_of_delivery_latitude, orderData.place_of_delivery_longitude),
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        gestureHandling: 'greedy'
+    });
+    var myCoords = {
+        route: [
+            new google.maps.LatLng(Number(orderData.place_of_delivery_latitude),Number(orderData.place_of_delivery_longitude)),
+            new google.maps.LatLng(Number(orderData.delegate_lastLatitude),Number(orderData.delegate_lastLongitude)),
+            new google.maps.LatLng(Number(orderData.delivery_place_latitude), Number(orderData.delivery_place_longitude))
+
+        ],
+    };
+
+    var routesOptions = {
+        route: {
+            color: '#70cc23'
+        }
+    };
+
+    var renderer = new google.maps.DirectionsRenderer({
+        suppressPolylines: true,
+        suppressMarkers: true,
+        infoWindow: infowindow,
+        polylineOptions: {
+            strokeColor: '#C83939',
+            strokeOpacity: 0,
+            strokeWeight: 1,
+            icons: [{
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: '#C83939',
+                    scale: 3,
+                    strokeOpacity: 1
+                },
+                offset: '0',
+                repeat: '15px'
+            }]
+        }
+
+    });
+
+    function renderDirections(result, color, course) {
+        renderer.setDirections(result);
+        renderer.setMap(map);
+        renderDirectionsPolylines(result, color, course);
+        console.log(renderer.getDirections());
+    }
+    var polylineOptions = {
+        strokeColor: '#C83939',
+        strokeOpacity: 1,
+        strokeWeight: 4
+    };
+
+    function renderDirectionsPolylines(response, color, course) {
+        var polylines = [];
+        polylineOptions.strokeColor = color;
+        for (var i = 0; i < polylines.length; i++) {
+            polylines[i].setMap(null);
+        }
+        var legs = response.routes[0].legs;
+        for (i = 0; i < legs.length; i++) {
+            var steps = legs[i].steps;
+            for (j = 0; j < steps.length; j++) {
+                var nextSegment = steps[j].path;
+                var stepPolyline = new google.maps.Polyline(polylineOptions);
+                for (k = 0; k < nextSegment.length; k++) {
+                    stepPolyline.getPath().push(nextSegment[k]);
+                }
+                stepPolyline.setMap(map);
+                polylines.push(stepPolyline);
+                google.maps.event.addListener(stepPolyline, 'click', function(evt) {
+                    infowindow.setContent("you clicked on " + course + "<br>" + evt.latLng.toUrlValue(6));
+                    infowindow.setPosition(evt.latLng);
+                    infowindow.open(map);
+                })
+            }
+        }
+    }
+
+    function drawMarkers(position, color, course) {
+        if(myCoords.route[0].lat()===position.lat()&&myCoords.route[0].lng()===position.lng()){
+            console.log('first');
+            title=strings['place_of_delivery'];
+            markerPath='img/marker-shop.png';
+            /* markerPath={
+                 path: google.maps.SymbolPath.CIRCLE,
+                 scale: 5,
+                 fillColor: color,
+                 fillOpacity: 1,
+                 strokeWeight: 0,
+                 image: ''
+             };*/
+        }else if(myCoords.route[myCoords.route.length-1].lat()===position.lat()&&myCoords.route[myCoords.route.length-1].lng()===position.lng()){
+            console.log('last');
+            title=strings['delivery_place'];
+            markerPath='img/marker-home.png';
+        }else if(myCoords.route.length>=2&&myCoords.route[1].lat()===position.lat()&&myCoords.route[1].lng()===position.lng()){
+            console.log('delegate');
+            title=strings['delegate_position'];
+            markerPath='img/marker-delegate.png';
+        }
+        var marker = new google.maps.Marker({
+            position: position,
+            clickable: true,
+            title: title,
+            label: {
+                text: course,
+                fontSize: "0px"
+            },
+            icon: markerPath,
+            map: map
+        });
+        markers.push(marker);
+        redirectTo(marker, marker.label.text);
+    }
+
+    function buildPath(origin, destination, wayPoints, color, route) {
+        directionsService.route({
+                origin: origin,
+                destination: destination,
+                waypoints: wayPoints,
+                travelMode: google.maps.DirectionsTravelMode.DRIVING
+            },
+            function(result, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    renderDirections(result, color, route);
+                }
+            });
+        var labelPosition = setLabelPosition(route);
+        console.log(labelPosition, 'labelPosition');
+    }
+
+    function redirectTo(element, identifier) {
+        google.maps.event.addListener(element, 'click', function(evt) {
+
+            console.log(evt.latLng.lat(),evt.latLng.lng())
+            console.log(myCoords.route[0].lat(),myCoords.route[0].lng())
+            if(myCoords.route[0].lat()===evt.latLng.lat()&&myCoords.route[0].lng()===evt.latLng.lng()){
+                console.log('first');
+                if(userData.type=='delegate'){
+                    $(".loader").show();
+                    navigator.geolocation.getCurrentPosition(function(currentPosition){
+                        var longitude = currentPosition.coords.longitude;
+                        var latitude = currentPosition.coords.latitude;
+                        var geocoder = new google.maps.Geocoder();
+                        var latlng = {lat: latitude, lng: longitude};
+                        geocoder.geocode({'location': latlng}, function(results, status) {
+                            $(".loader").hide();
+                            if (status === google.maps.GeocoderStatus.OK) {
+                                address=results[0].formatted_address;
+                                launchnavigator.navigate(orderData.place_of_delivery_address, {
+                                    start: address,
+                                    enableDebug: true,
+                                    successCallback: function(){},
+                                    errorCallback: function(){}
+                                });
+                                return false;
+                            } else {
+                                alert('Geocode was not successful for the following reason: ' + status);
+                            }
+                        });
+
+                    }, onError)
+                }
+
+            }else if(myCoords.route[myCoords.route.length-1].lat()===evt.latLng.lat()&&myCoords.route[myCoords.route.length-1].lng()===evt.latLng.lng()){
+                console.log('last');
+                if(userData.type=='delegate'){
+                    $(".loader").show();
+                    navigator.geolocation.getCurrentPosition(function(currentPosition){
+                        var longitude = currentPosition.coords.longitude;
+                        var latitude = currentPosition.coords.latitude;
+                        var geocoder = new google.maps.Geocoder();
+                        var latlng = {lat: latitude, lng: longitude};
+                        geocoder.geocode({'location': latlng}, function(results, status) {
+                            $(".loader").hide();
+                            if (status === google.maps.GeocoderStatus.OK) {
+                                address=results[0].formatted_address;
+                                launchnavigator.navigate(orderData.delivery_place_address, {
+                                    start: address,
+                                    enableDebug: true,
+                                    successCallback: function(){},
+                                    errorCallback: function(){}
+                                });
+
+                                return false;
+                            } else {
+                                alert('Geocode was not successful for the following reason: ' + status);
+                            }
+                        });
+
+                    }, onError)
+                }
+
+            }else if(myCoords.route.length>=2&&myCoords.route[1].lat()===evt.latLng.lat()&&myCoords.route[1].lng()===evt.latLng.lng()){
+                console.log('delegate');
+            }
+        })
+    };
+
+    function setLabelPosition(course) {
+        switch (course) {
+            case 'route':
+                return 'labelAnchor: new google.maps.Point(90,20))';
+                break;
+        }
+    }
+
+    Object.keys(myCoords).forEach(function(key) {
+        var curentOrigin = myCoords[key][0],
+            curentDestination = myCoords[key][myCoords[key].length - 1],
+            wayPoints = [],
+            color = routesOptions[key].color;
+        for (var j = 1; j < myCoords[key].length - 1; j++) {
+            wayPoints.push({
+                location: myCoords[key][j],
+                stopover: true
+            });
+            if (j === myCoords[key].length - 2) {
+                console.log(curentOrigin)
+                buildPath(curentOrigin, curentDestination, wayPoints, color, key);
+            }
+        }
+        for (var j = 0; j < myCoords[key].length; j++) {
+            drawMarkers(myCoords[key][j], color, key);
+        }
+    });
+    $(document).on('click','[href="#Location"]',function(){
+        console.log('href="#Location"')
+        map.setZoom(15);
+    })
+    setInterval(function(){
+
+        $.ajax({
+            type: "GET",
+            url: makeURL('foreraa_orders/'+orderData.order_id),
+            success: function (msg) {
+                if(msg.success){
+                    orderData=msg.result;
+                    markers[1].setPosition( new google.maps.LatLng(orderData.delegate_lastLatitude,orderData.delegate_lastLongitude));
+                    window.sessionStorage.setItem("orderData",JSON.stringify(orderData));
+                }
+            }
+
+        });
+    },5000)
+
+}
 function translate(){
 $("[trans-lang-html]").each(function () {
     //console.log($(this).attr('trans-lang-html'));
@@ -92,9 +559,10 @@ $(document).ready(function(){
             }
         }
     });
+
 });
 
-        
+
 var userData = window.sessionStorage.getItem("userData");
 var appSettings= window.sessionStorage.getItem("appSettings");
 if(appSettings){
@@ -117,20 +585,79 @@ function checkForChanges()
         windowHeight=$(window).height();
         elementHeight=$element.height();
         minHeight=(windowHeight>elementHeight)?windowHeight:elementHeight;
-        $(".innerpage-section-padding").css({"min-height":minHeight+50})
+        console.log(filename)
+        if(filename=='single-order-chats.html'||filename=='map.html'){
+            //$(".innerpage-section-padding").css({"min-height":minHeight-100})
+            $(".innerpage-section-padding").css({"min-height":minHeight+50,"background":"#e0e0de"})
+        }else{
+            $(".innerpage-section-padding").css({"min-height":minHeight+50,"padding":"40px 0px 50px"})
+        }
+
         lastHeight = $element.css('height');
     }
 
     setTimeout(checkForChanges, 500);
 }
 checkForChanges();
-$(".innerpage-section-padding").css({"min-height":$(window).height()+50})
+if(filename=='single-order-chats.html'||filename=='map.html'){
+    //$(".innerpage-section-padding").css({"min-height":$(window).height()-100})
+    $(".innerpage-section-padding").css({"min-height":$(window).height()+50,"background":"#e0e0de"})
+}else{
+    console.log('here');
+    $(".innerpage-section-padding").css({"min-height":$(window).height()+50,"padding":"40px 0px 50px"})
+}
 //console.log(userData);
-url = window.location.pathname;
-var filename = url.substring(url.lastIndexOf('/')+1);
+
 function get(name){
     if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
         return decodeURIComponent(name[1]);
+}
+function reloadSingleOrder(){
+    userData=window.sessionStorage.getItem('userData');
+    if(userData){
+        userData=JSON.parse(userData);
+    }
+    orderData=window.sessionStorage.getItem('orderData');
+    if(orderData){
+        orderData=JSON.parse(orderData);
+    }
+    user_id=userData.id
+    order_id=orderData.order_id;
+    if(user_id&&order_id){
+        if(userData.type=='customer'){
+            if(user_id){
+                $.ajax({
+                    type: "GET",
+                    url: makeURL('foreraa_orders/'+order_id+'?user_id='+user_id),
+                    success: function (msg) {
+                        if(msg.success){
+                            window.sessionStorage.setItem("orderData",JSON.stringify(msg.result));
+                            orderData=msg.result;
+                            orderDataHTML(orderData,userData);
+                            addRating();
+                            initMap();
+                        }
+
+                    }
+                });
+            }
+        }else{
+            $.ajax({
+                type: "GET",
+                url: makeURL('foreraa_orders/'+order_id+'?delegate_id='+user_id),
+                success: function (msg) {
+                    if(msg.success){
+                        window.sessionStorage.setItem("orderData",JSON.stringify(msg.result));
+                        orderData=msg.result;
+                        orderDataHTML(orderData,userData);
+                        addRating();
+                        initMap();
+                    }
+
+                }
+            });
+        }
+    }
 }
 function includeHTML() {
     var z, i, elmnt, file, xhttp;
@@ -145,6 +672,7 @@ function includeHTML() {
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4) {
+                    if (this.status == 0) {elmnt.innerHTML = this.responseText;}
                     if (this.status == 200) {elmnt.innerHTML = this.responseText;}
                     if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
                     /*remove the attribute, and call this function once more:*/
@@ -226,31 +754,60 @@ function statusIcon(statues) {
     }
 }
 //the url of api requests
-var SITEURL="http://4reara.almoasherbiz.com/";
-var APIURL="http://4reara.almoasherbiz.com/ForeraaAPI/";
+var SITEURL="http://4reraa.com/";
+var APIURL="http://4reraa.com/ForeraaAPI/";
 //var APIURL="http://localhost/foreraa/public/ForeraaAPI/";
-
+console.log(APIURL);
 //create route request url
 function makeURL(route){
+
     return APIURL+route;
 }
 
 function getMessages(response,element){
+    messagesText='';
+    messageTitle='';
+    messageButton='';
+    messageTitle=(response.success)?strings['success_title']:strings['error_title'];
+    messageButton=strings['ok'];
     html='<div class="alert '+((response.success)?'alert-success':'alert-danger')+'">';
     message=response.message;
     if(message.length==1){
+        messagesText+=(messagesText.length)?"\n"+((typeof strings[message[0]]=='undefined')?message[0]:strings[message[0]]):((typeof strings[message[0]]=='undefined')?message[0]:strings[message[0]]);
         html+=((typeof strings[message[0]]=='undefined')?message[0]:strings[message[0]])+'</div>';
         $(element).html(html);
+        if(navigator.notification) {
+            navigator.notification.alert(
+                messagesText,  // message
+                function () {
+                    console.log('alert callback');
+                },         // callback
+                messageTitle,            // title
+                messageButton                  // buttonName
+            );
+        }
         return'';
     }
     html+='<ul>';
     if(Array.isArray(message)){
        message.forEach(function(item){
+          messagesText+=(messagesText.length)?"\n"+((typeof strings[item]=='undefined')?item:strings[item]):((typeof strings[item]=='undefined')?item:strings[item]);
           html+='<li>'+((typeof strings[item]=='undefined')?item:strings[item])+'</li>'
        })
     }
     html+='</ul></div>';
-    $(element).html(html);
+    //$(element).html(html);
+    if(navigator.notification){
+        navigator.notification.alert(
+            messagesText,  // message
+            function(){
+                console.log('alert callback');
+            },         // callback
+            messageTitle,            // title
+            messageButton                  // buttonName
+        );
+    }
+
 }
 // Device Event Listener
 $(document).ready(function(){
@@ -279,12 +836,95 @@ function successDB() {
 }
 
 function onDeviceReady() {
+   /* console.log('window.cordova && window.cordova.plugins.keyboard=1=');
+    console.log(Keyboard);
+    if (typeof Keyboard.shrinkView!='undefined') {
+        Keyboard.shrinkView(true);
+        Keyboard.show();
+        console.log('window.cordova && window.cordova.plugins.keyboard=2=');
+    }*/
 
+    goHome=0;
+    /*document.addEventListener('keyboardDidHide', function (e) {
+        e.preventDefault();
+        console.log('keyboardDidHide');
+        // Describe your logic which will be run each time keyboard is closed.
+    },false);
+    document.addEventListener('keyboardWillHide', function (e) {
+        e.preventDefault();
+        console.log('keyboardWillHide');
+        // Describe your logic which will be run each time when keyboard is about to be closed.
+    },false);*/
+    document.addEventListener("backbutton", function(){
+        switch (filename){
+            case 'single-order-chats.html':
+                window.location.href='single-order.html';
+                break;
+            case 'single-order.html':
+                window.location.href='my-orders.html';
+                break;
+            case 'map.html':
+                if(goHome>0){
+                    navigator.app.exitApp();
+                }
+                window.plugins.toast.showShortTop(strings['click_to_close'], function(a){console.log('toast success: ' + a);goHome++;}, function(b){alert('toast error: ' + b)})
+                break;
+            default:
+                window.location.href='index.html';
 
-    $( ".page-cover" ).after( ' <div style="height:60px;" class="text-center"><img src="img/loading.gif" alt="" style="height: 35px;width:  35px;margin-top:  20px;"></div>' );
+        }
+    }, false);
+    if(navigator.connection.type=='none'){
+        if(navigator.notification) {
+            navigator.notification.alert(
+                strings['open_internet_connection'],  // message
+                function () {
+                    if (window.cordova && window.cordova.plugins.settings) {
+                        console.log('openNativeSettingsTest is active');
+                        window.cordova.plugins.settings.open("wifi", function() {
+                                console.log('opened settings');
+                            },
+                            function () {
+                                console.log('failed to open settings');
+                            }
+                        );
+                    } else {
+                        console.log('openNativeSettingsTest is not active!');
+                    }
+                },         // callback
+                strings['error'],            // title
+                strings['ok']                  // buttonName
+            );
+        }
+    }
+    if(typeof cordova!='undefined'){
+        cordova.plugins.locationAccuracy.canRequest(function(canRequest){
+            if(canRequest){
+                cordova.plugins.locationAccuracy.request(function (success){
+                    console.log("Successfully requested accuracy: "+success.message);
+                }, function (error){
+                    console.error("Accuracy request failed: error code="+error.code+"; error message="+error.message);
+                    if(error.code !== cordova.plugins.locationAccuracy.ERROR_USER_DISAGREED){
+                        if(window.confirm(strings['filed_open_location'])){
+                            cordova.plugins.diagnostic.switchToLocationSettings();
+                        }
+                    }
+                }, cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY);
+            }else{
+                // request location permission and try again
+            }
+        });
+    }
+
+    if(userData&&appSettings&&userData.type=='delegate'&&userData.balance>=appSettings.delegate_limit_cash){
+        $( ".page-cover" ).after('<div id="delegate-limited-message"><span>'+strings['delegated_limit_message']+'</span> <a href="payment_methods.html">'+strings['from_her']+'</a></div>');
+    }
+
+    //$( ".page-cover" ).after( ' <div id="loading" style="height:60px;" class="text-center"><img src="img/loading.gif" alt="" style="height: 35px;width:  35px;margin-top:  20px;"></div>' );
+
     //console.log(window.location.href);
-    console.log(window.pageYOffset)
-    window.scrollBy(0, 60);
+    //console.log(window.pageYOffset)
+    //window.scrollBy(0, 60);
     var db = window.openDatabase("foreraa_app.db", "1.0", "Foreraa App", 200000);
     console.log('db');
     db.transaction(function(tx){
@@ -295,23 +935,20 @@ function onDeviceReady() {
             if(res.rows.length){
                 userDataDB=res.rows[0]
                 console.log(userDataDB);
-                if(!userData){
-                    $.ajax({
-                        type: "POST",
-                        url: makeURL('foreraa_users/login'),
-                        data: {"phone":userDataDB.username,"password":userDataDB.password},
-                        success: function (msg) {
-                            $(".loader").hide();
-                            if(msg.success){
-                                window.sessionStorage.setItem("userData", JSON.stringify(msg.result));
+                $.ajax({
+                    type: "POST",
+                    url: makeURL('foreraa_users/login'),
+                    data: {"phone":userDataDB.username,"password":userDataDB.password},
+                    success: function (msg) {
+                        $(".loader").hide();
+                        if(msg.success){
+                            window.sessionStorage.setItem("userData", JSON.stringify(msg.result));
+                            if(!userData){
                                 window.location.href="map.html";
                             }
                         }
-
-                    });
-                }
-
-
+                    }
+                });
             }
 
         });
@@ -445,6 +1082,15 @@ function onDeviceReady() {
 
     if(userData){
         changeData=setInterval(function(){
+            try
+            {
+                userData=JSON.parse(userData);
+            }
+            catch(e)
+            {
+                // handle error
+            }
+
             if($("#userImage").length){
                 $("#logoutMenu").removeClass('hidden');
                 $("#userImage").attr('src',userData.image);
@@ -453,11 +1099,13 @@ function onDeviceReady() {
                 if(userData.type=='customer'){
                     $("#delegateRatings").removeClass('hidden')
                 }else{
+                    $("#paymentMethods").removeClass('hidden')
                     if(userData.delegateData.status=='online'){
                         $("#makeOffline").removeClass('hidden');
                     }else{
                         $("#makeOnline").removeClass('hidden');
                     }
+                    $("#availableOrdersMenu").removeClass('hidden')
                 }
                 clearInterval(changeData);
             }
@@ -472,7 +1120,7 @@ function onDeviceReady() {
     }else{
         changeData=setInterval(function() {
             if($("#userImage").length) {
-                $("#serviceMenu,#complaintsMenu,#myOrdersMenu,#myAccountMenu").addClass('hidden');
+                $("#serviceMenu,#complaintsMenu,#myOrdersMenu,#availableOrdersMenu,#myAccountMenu").addClass('hidden');
             }
         },300);
     }
@@ -980,7 +1628,7 @@ $(document).on('click','#getAllServices,#serviceMenu',function(e){
     }
     $.ajax({
         type: "GET",
-        url: makeURL('foreraa_services'),
+        url: makeURL('foreraa_services?Lang='+selectedLang),
         success: function (msg) {
             //getMessages(msg,"#response")
             $(".loader").hide();
@@ -1254,14 +1902,26 @@ function searchOnGoogleMap(serviceData) {
                 $("#distanceInput").val(distance);
                 $("#duration").html(duration);
                 $("#durationInput").val(duration);
-                cost=0;
+                $.ajax({
+                    type: "GET",
+                    url: makeURL('foreraa_orders/calculateCost'),
+                    data:{"distance":distance},
+                    success: function (msg) {
+                        if(msg.success){
+                            cost=msg.cost;
+                            $("#costInput").val(cost);
+                            $("#cost").html(cost+strings.currency_code);
+                        }
+                    }
+                });
+                /*cost=0;
                 if(parseFloat(distance)<=3){
                     cost=3;
                 }else{
                     cost=((parseFloat(distance)-3)*1)+3;
                 }
                 $("#costInput").val(cost);
-                $("#cost").html(cost+" $")
+                $("#cost").html(cost+strings.currency_code)*/
             });
         }
 
@@ -1354,14 +2014,16 @@ var orderValidator = $("#order-form").validate({
         //alert('start');
         //$("#charge-btn").attr("disabled", true);
         $(".loader").show();
+        $("#makeOrder").attr('disabled','disabled');
         $.ajax({
             type: "POST",
             url: makeURL('foreraa_orders'),
             data:$("#order-form").serialize(),
             success: function (msg) {
+                $("#makeOrder").removeAttr('disabled');
                 getMessages(msg,"#response")
                 if(msg.success){
-
+                    $("#order-form")[0].reset();
                 }
                 $(".loader").hide();
             }
@@ -1393,7 +2055,7 @@ var serviceOrderValidator = $("#service-order-form").validate({
     highlight: function(element) {
         //console.log("highlight:");
         //console.log(element);
-        if($(element).attr("id")=='order_details'){
+        if($(element).attr("id")=='order_details'||$(element).attr("id")=='coupon'){
             $(element).closest('.form-group').addClass('has-error');
         }else{
             //console.log($($(element).data("element")).parent().addClass('has-error'));
@@ -1436,7 +2098,31 @@ var serviceOrderValidator = $("#service-order-form").validate({
         },
         delivery_time : {
             required:true,
-        }
+        },
+        coupon:{
+            //validateUserEmail:true,
+            remote: {
+                url: makeURL('foreraa_coupons/checkCouponsCode'),
+                type: "POST",
+                cache: false,
+                //dataType: "json",
+                data: {
+                    coupon: function() { return $("#coupon").val(); },
+                },
+                dataFilter: function(data) {
+                    data=$.parseJSON(data);
+                    console.log(data);
+                    console.log(data.success);
+                    if(data.success==false){
+                        console.log(data.message);
+                        $.extend($.validator.messages,{remote:strings[data.message[0]]});
+                        return false;
+                    }else{
+                        return true;
+                    }
+                }
+            }
+        },
     },
     messages: {
     },
@@ -1444,14 +2130,17 @@ var serviceOrderValidator = $("#service-order-form").validate({
         //alert('start');
         //$("#charge-btn").attr("disabled", true);
         $(".loader").show();
+        $("#makeOrder").attr('disabled','disabled');
         $.ajax({
             type: "POST",
             url: makeURL('foreraa_orders'),
             data:$("#service-order-form").serialize(),
             success: function (msg) {
+                $("#makeOrder").removeAttr('disabled');
                 getMessages(msg,"#response")
                 if(msg.success){
                     $("#service-order-form").hide();
+
                     setTimeout(function(){
                         window.location.href="service.html";
                     },4000)
@@ -1604,28 +2293,7 @@ $(document).on('click','.single-delegate-order',function(e){
         }
     });
 });
-$(document).on('click','.confirmOrder',function(e){
-    e.preventDefault();
-    console.log('confirmOrder');
-    el=$(this);
-    order_id=$(this).data('id');
-    user_id=userData.id;
-    if(user_id){
-        $.ajax({
-            type: "POST",
-            url: makeURL('foreraa_users/'+user_id+'/confirmOrder'),
-            data:{"order_id":order_id},
-            success: function (msg) {
-                if(msg.success){
-                   el.remove();
-                }else{
-                    getMessages(msg,"#response")
-                }
 
-            }
-        });
-    }
-});
 /*$(document).on('click','.cancelOrder',function(e){
     e.preventDefault();
     console.log('cancelOrder');
@@ -1718,19 +2386,26 @@ function getChatData(orderData,userData){
                 }
                 console.log(html);
                 $(".chat_area ul.list-unstyled").html(html);
+                //$('.chat_area').scrollTop($('.chat_area')[0].scrollHeight);
             }
         }
     });
 }
 $(document).on('click','#sendChatMessage',function(e){
+   /* if (typeof Keyboard.shrinkView!='undefined') {
+        console.log('show keypoard')
+        Keyboard.show();
+    }*/
+
+
     e.preventDefault();
     var userData = window.sessionStorage.getItem("userData");
     userData=JSON.parse(userData);
     order_id=$("#chatOrderID").val();
     user_id=userData.id;
     message=$("#chatMessage").val();
-
     if(message.length){
+        $("#sendChatMessage").attr('disabled','disabled');
         $(".message_write").removeClass('has-error');
         $.ajax({
             type: "POST",
@@ -1741,6 +2416,7 @@ $(document).on('click','#sendChatMessage',function(e){
                   $("#noMessageDiv").remove();
                   $("#chatMessage").val('')
                   $(".chat_area ul.list-unstyled").append('<li class="left clearfix admin_chat"> <span class="chat-img1 pull-right"> <img src="'+userData.image+'" alt="'+userData.name+'" class="img-circle"> </span> <div class="chat-body1 clearfix"> <p>'+message+'</p> <div class="chat_time pull-left">'+formatDate(new Date())+' '+formatTime(new Date())+'</div> </div> </li>');
+                  $("#sendChatMessage").removeAttr('disabled');
                 }
             }
         });
@@ -1793,7 +2469,42 @@ function onSuccessPhoto(imageURI) {
 function onFailPhoto(message) {
     alert('Failed because: ' + message);
 }
-$(document).on('click','#uploadInvoice',function(e){
+$(document).on('click','#uploadInvoiceCamera',function(e){
+    e.preventDefault();
+    el=$(this);
+    order_id=el.data('id');
+    delegate_id=el.attr('data-delegate-id');
+    navigator.camera.getPicture(function(imageURI){
+            $(".loader").show();
+            var options = new FileUploadOptions();
+            options.fileKey = "image";
+            options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+            options.mimeType = "image/jpeg";
+            var params = {};
+            params.order_id = order_id;
+            params.delegate_id = delegate_id;
+            options.params = params;
+            options.chunkedMode = false;
+            var ft = new FileTransfer();
+            ft.upload(imageURI, APIURL+"foreraa_orders/uploadInvoice", function(result){
+                console.log('successfully uploaded ' + result.response);
+                responseData=JSON.parse(result.response);
+                console.log(responseData.success);
+                if(responseData.success){
+                    $("#uploadInvoiceDiv").remove();
+                    $(".loader").hide();
+                    reloadSingleOrder();
+                }
+            }, function(error){
+                console.log('error : ' + JSON.stringify(error));
+            }, options);
+    }, function(error){
+        console.log('error : ' + JSON.stringify(error));
+    }, { quality: 20,
+        destinationType: Camera.DestinationType.FILE_URL
+    });
+});
+$(document).on('click','#uploadInvoiceGallery',function(e){
     e.preventDefault();
     el=$(this);
     order_id=el.data('id');
@@ -1815,8 +2526,9 @@ $(document).on('click','#uploadInvoice',function(e){
             responseData=JSON.parse(result.response);
             console.log(responseData.success);
             if(responseData.success){
-                el.remove();
+                $("#uploadInvoiceDiv").remove();
                 $(".loader").hide();
+                reloadSingleOrder();
             }
         }, function(error){
             console.log('error : ' + JSON.stringify(error));
@@ -1903,6 +2615,30 @@ $(document).on('click','#showCancelForm',function(e){
     $(this).html((($(this).html()==strings['show_cancel_form'])?strings['hide_cancel_form']:strings['show_cancel_form']))
     $('#cancelOrderDiv').toggle();
 });
+
+$(document).on('click','.confirmOrder',function(e){
+    e.preventDefault();
+    console.log('confirmOrder');
+    el=$(this);
+    order_id=$(this).data('id');
+    user_id=userData.id;
+    if(user_id){
+        $.ajax({
+            type: "POST",
+            url: makeURL('foreraa_users/'+user_id+'/confirmOrder'),
+            data:{"order_id":order_id},
+            success: function (msg) {
+                if(msg.success){
+                    el.remove();
+                    reloadSingleOrder();
+                }else{
+                    getMessages(msg,"#response")
+                }
+
+            }
+        });
+    }
+});
 $(document).on('click','#confirmInvoice',function(e){
     e.preventDefault();
     el=$(this);
@@ -1915,6 +2651,7 @@ $(document).on('click','#confirmInvoice',function(e){
         success: function (msg) {
             if(msg.success){
                el.remove();
+               reloadSingleOrder();
             }
         }
     });
@@ -1931,6 +2668,7 @@ $(document).on('click','#makeClosed',function(e){
         success: function (msg) {
             if(msg.success){
                 el.remove();
+                reloadSingleOrder();
             }
         }
     });
@@ -1941,3 +2679,45 @@ $(document).on('change','input[name="type"]',function(e){
     $(".type-icon").removeClass('fa-arrow-right');
     $("#label-"+val+" .type-icon").addClass('fa-arrow-right')
 });
+$(document).on('click','#makInviteFriend',function(e){
+    e.preventDefault();
+    $.ajax({
+        type: "GET",
+        url: makeURL('appSettings'),
+        success: function (msg) {
+            if(msg.success){
+                resultData=msg.result;
+                message=(resultData.invite_friend_message)?resultData.invite_friend_message:null
+                subject=(resultData.invite_friend_subject)?resultData.invite_friend_subject:null
+                image=(resultData.invite_friend_image)?resultData.invite_friend_image:null
+                link=(resultData.invite_friend_android_link)?resultData.invite_friend_android_link:null
+                window.plugins.socialsharing.share(message, subject, image, link)
+            }
+        }
+    });
+
+});
+function encodeImageUri(imageData) {
+    var c = document.createElement('canvas');
+    var ctx = c.getContext("2d");
+    var img = new Image();
+    img.onload = function() {
+        c.width = this.width;
+        c.height = this.height;
+        ctx.drawImage(img, 0, 0);
+    };
+    img.src = imageData;
+    var dataURL = c.toDataURL("image/jpeg");
+    console.log(dataURL);
+    return dataURL;
+}
+
+$(document).on('click','.order-image',function(e){
+    imageSrc=$(this).attr('src');
+    title=$(this).attr('data-title');
+    PhotoViewer.show(imageSrc, title);
+/*
+    //FullScreenImage.showImageBase64(encodeImageUri(imageSrc));
+    FullScreenImage.showImageBase64('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCACWASwDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AJVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//9k=','img.jpg');*/
+})
+

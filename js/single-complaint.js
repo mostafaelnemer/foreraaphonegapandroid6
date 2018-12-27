@@ -8,7 +8,26 @@ if(complaintData){
     user_id=userData.id;
     $("#complaint-title").html('Complaint Number #'+complaintData.id);
     $("#complaint-details").html(complaintData.complaint);
-    window.document.addEventListener("scroll", function(){
+    PullToRefresh.init({
+        mainElement: '.page-wrapper', // above which element?
+        onRefresh: function (cb) {
+            $(".loader").show();
+            $.ajax({
+                type: "GET",
+                url: makeURL('foreraa_complaints/'+complaint_id+'?user_id='+user_id),
+                success: function (msg) {
+                    if(msg.success){
+                        window.sessionStorage.setItem("complaintData",JSON.stringify(msg.result));
+                        complaintData=msg.result;
+                        $("#complaint-title").html('Complaint Number #'+complaintData.id);
+                        $("#complaint-details").html(complaintData.complaint);
+                        cb();
+                    }
+                }
+            });
+        }
+    });
+    /*window.document.addEventListener("scroll", function(){
         if(window.pageYOffset == 0){
             $(".loader").show();
             $.ajax({
@@ -28,7 +47,7 @@ if(complaintData){
 
 
         }
-    },false)
+    },false)*/
 }else{
     window.location.href="my-orders.html"
 }

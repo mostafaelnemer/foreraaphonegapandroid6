@@ -12,9 +12,17 @@ if(userData){
     $("#userLinkedinData").val(userData.linkedin_link);
     $("#userInstagramData").val(userData.instagram_link);
     $("#userYoutubeData").val(userData.youtube_link);
-    window.document.addEventListener("scroll", function(){
+    PullToRefresh.init({
+        mainElement: '.page-wrapper', // above which element?
+        onRefresh: function (cb) {
+            setTimeout(function () {
+                cb();
+            }, 1500);
+        }
+    });
+    /*window.document.addEventListener("scroll", function(){
         if(window.pageYOffset == 0){
             window.scrollBy(0, 60);
         }
-    },false)
+    },false)*/
 }
