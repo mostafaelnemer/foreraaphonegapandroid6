@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Device Properties Example</title>
+
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+        // Wait for Cordova to load
+        //
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        // Record audio
+        //
+        var src = "myrecording.mp3";
+        function recordAudio() {
+
+            window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, function(fileSystem){
+                fileSystem.root.getFile(src, {
+                    create: true,
+                    exclusive: false
+                }, function(fileEntry){
+                    fileURL = fileEntry.toURL();
+                }, fail);
+            }, fail);
+            var mediaRec = new Media(src, onSuccess, onError);
+
+            // Record audio
+            mediaRec.startRecord();
+
+            // Stop recording after 10 sec
+            var recTime = 0;
+            var recInterval = setInterval(function() {
+                recTime = recTime + 1;
+                setAudioPosition(recTime + " sec");
+                if (recTime >= 10) {
+                    clearInterval(recInterval);
+                    mediaRec.stopRecord();
+                    playAudio('myrecording.mp3');
+                }
+            }, 1000);
+        }
+        var win = function (r) {
+            console.log("Code = " + r.responseCode);
+            console.log("Response = " + r.response);
+            console.log("Sent = " + r.bytesSent);
+        }
+
+        var fail = function (error) {
+            alert("An error has occurred: Code = " + error.code);
+            console.log("upload error source " + error.source);
+            console.log("upload error target " + error.target);
+        }
+        var SITEURL="http://4reara.almoasherbiz.com/";
+        var APIURL="http://4reara.almoasherbiz.com/ForeraaAPI/";
+        //var APIURL="http://localhost/foreraa/public/ForeraaAPI/";
+
+        //create route request url
+        function makeURL(route){
+            return APIURL+route;
+        }
+        function playAudio(url) {
+            // Play the audio file at url
+            var options = new FileUploadOptions();
+            options.fileKey = "file";
+            options.fileName = src;
+            options.mimeType = "audio/mp3";
+
+            var ft = new FileTransfer();
+            ft.upload(fileURL, encodeURI(makeURL('foreraa_orders/saveRecord')), win, fail, options);
+
+            var my_media = new Media(url,
+                // success callback
+                function() {
+                    console.log("playAudio():Audio Success");
+                },
+                // error callback
+                function(err) {
+                    console.log("playAudio():Audio Error: "+err);
+                });
+
+            // Play audio
+            my_media.play();
+
+            // Mute volume after 2 seconds
+            setTimeout(function() {
+                my_media.setVolume('0.0');
+            }, 2000);
+
+            // Set volume to 1.0 after 5 seconds
+            setTimeout(function() {
+                my_media.setVolume('1.0');
+            }, 5000);
+        }
+
+        // Cordova is ready
+        //
+        function onDeviceReady() {
+            //recordAudio();
+            // this is the complete list of currently supported params you can pass to the plugin (all optional)
+            var options = {
+                message: 'share this', // not supported on some apps (Facebook, Instagram)
+                subject: 'the subject', // fi. for email
+                files: ['', ''], // an array of filenames either locally or remotely
+                url: 'https://www.website.com/foo/#bar?a=b',
+                chooserTitle: 'Pick an app', // Android only, you can override the default share sheet title,
+                appPackageName: 'com.apple.social.facebook' // Android only, you can provide id of the App you want to share with
+            };
+
+            var onSuccess = function(result) {
+                console.log("Share completed? " + result.completed); // On Android apps mostly return false even while it's true
+                console.log("Shared to app: " + result.app); // On Android result.app since plugin version 5.4.0 this is no longer empty. On iOS it's empty when sharing is cancelled (result.completed=false)
+            };
+
+            var onError = function(msg) {
+                console.log("Sharing failed with message: " + msg);
+            };
+
+            window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError);
+        }
+
+        // onSuccess Callback
+        //
+        function onSuccess() {
+            console.log("recordAudio():Audio Success");
+        }
+
+        // onError Callback
+        //
+        function onError(error) {
+            alert('code: '    + error.code    + '\n' +
+                'message: ' + error.message + '\n');
+        }
+
+        // Set audio position
+        //
+        function setAudioPosition(position) {
+            document.getElementById('audio_position').innerHTML = position;
+        }
+
+    </script>
+</head>
+<body>
+<button onclick="window.plugins.socialsharing.share('Message only')">message only</button>
+<button onclick="window.plugins.socialsharing.share('Message and subject', 'The subject')">message and subject</button>
+<button onclick="window.plugins.socialsharing.share(null, null, null, 'http://www.x-services.nl')">link only</button>
+<button onclick="window.plugins.socialsharing.share('Message and link', null, null, 'http://www.x-services.nl')">message and link</button>
+<button onclick="window.plugins.socialsharing.share(null, null, 'https://www.google.nl/images/srpr/logo4w.png', null)">image only</button>
+// Beware: passing a base64 file as 'data:' is not supported on Android 2.x: https://code.google.com/p/android/issues/detail?id=7901#c43
+// Hint: when sharing a base64 encoded file on Android you can set the filename by passing it as the subject (second param)
+<button onclick="window.plugins.socialsharing.share(null, 'Android filename', 'data:image/png;base64,R0lGODlhDAAMALMBAP8AAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAUKAAEALAAAAAAMAAwAQAQZMMhJK7iY4p3nlZ8XgmNlnibXdVqolmhcRQA7', null)">base64 image only</button>
+// Hint: you can share multiple files by using an array as thirds param: ['file 1','file 2', ..], but beware of this Android Kitkat Facebook issue: [#164]
+<button onclick="window.plugins.socialsharing.share('Message and image', null, 'https://www.google.nl/images/srpr/logo4w.png', null)">message and image</button>
+<button onclick="window.plugins.socialsharing.share('Message, image and link', null, 'https://www.google.nl/images/srpr/logo4w.png', 'http://www.x-services.nl')">message, image and link</button>
+<button onclick="window.plugins.socialsharing.share('Message, subject, image and link', 'The subject', 'https://www.google.nl/images/srpr/logo4w.png', 'http://www.x-services.nl')">message, subject, image and link</button>
+</body>
+</html>

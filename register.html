@@ -160,6 +160,7 @@
         <script src="js/bootstrap.min.js"></script>
         <script src="js/custom-navigation.js"></script>
         <script src="js/jquery.validate.min.js"></script>
+        <script src="js/pulltorefresh.js"></script>
         <script src="js/index.js"></script>
         <script src="js/register.js"></script>
         <script>
@@ -178,12 +179,19 @@
                     console.log(error);
                 });
             }
-            window.document.addEventListener("scroll", function(){
+            PullToRefresh.init({
+                mainElement: '.page-wrapper', // above which element?
+                onRefresh: function (cb) {
+                    $("#register-form")[0].reset();
+                    cb();
+                }
+            });
+            /*window.document.addEventListener("scroll", function(){
                 if(window.pageYOffset == 0){
                     $("#register-form")[0].reset();
                     window.scrollBy(0, 60);
                 }
-            },false)
+            },false)*/
         </script>
         <!-- Page Scripts Ends -->
     
