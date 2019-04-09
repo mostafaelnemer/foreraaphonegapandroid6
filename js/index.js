@@ -121,28 +121,26 @@ function orderDataHTML(orderData,userData){
         }
         if(orderData.statues=='inprogress'){
             //delegateHtml+='<div class="col-lg-12"><button id="uploadInvoice" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['create_invoice']+'">'+strings['create_invoice']+'</div>'
-            delegateHtml+='<div class="col-lg-12" id="uploadInvoiceDiv"> <h3>'+strings['invoice']+'</h3><div class="col-lg-6 col-xs-6 col-md-6"><button id="uploadInvoiceGallery" class="btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['gallery']+'">'+strings['gallery']+'</button></div><div class="col-lg-6 col-xs-6 col-md-6"><button id="uploadInvoiceCamera" class="btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['camera']+'">'+strings['camera']+'</button></div></div>'
+            delegateHtml+='<div class="col-lg-12" id="uploadInvoiceDiv"> <h3>'+strings['invoice']+'</h3><div class="col-lg-6 col-xs-6 col-md-6"><button id="uploadInvoiceGallery" class="btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['gallery']+'">'+strings['gallery']+'</button></div><div class="col-lg-6 col-xs-6 col-md-6"><button id="uploadInvoiceCamera" class="btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['camera']+'">'+strings['camera']+'</button></div><div class="clearfix"></div><div class="clearfix" style="height: 20px;"></div></div>'
         }
-        if(orderData.statues=='confirm_invoice'){
-            delegateHtml+='<div class="col-lg-12"><button id="makeClosed" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['closed_order']+'">'+strings['closed_order']+'</button></div>'
+        if(orderData.statues=='confirm_invoice'||orderData.statues=='has_invoice'){
+            delegateHtml+='<div class="col-lg-12"><div class="col-lg-12"><button id="makeClosed" class=" btn btn-info btn-block" data-delegate-id="'+userData.id+'" data-id="'+orderData.order_id+'" title="'+strings['closed_order']+'">'+strings['closed_order']+'</button></div></div><div class="clearfix"></div><div class="clearfix" style="height: 20px;"></div>'
         }
         if(orderData.has_customer_rating==0&&orderData.statues=='closed'){
-            delegateHtml+='<div class="clearfix"></div><div class="clearfix" style="height: 10px;"></div><div class="col-md-12"><form id="ratingCustomerForm" action="" method="post"><div id="ratingCustomerForm-response"></div> <input type="hidden" name="user_id" value="'+orderData.user_id+'"> <input type="hidden" name="delegate_id" value="'+orderData.delegate_id+'"> <input type="hidden" id="order_id" name="order_id" value="'+orderData.order_id+'"> <input id="ratings-hidden" name="rating" type="hidden"> <div class="form-group"><textarea class="form-control animated" cols="50" id="new-review" name="comment" placeholder="'+strings['enter_your_review_her']+'" rows="5"></textarea></div>  <div class="text-right"> <div class="stars starrr" data-rating="0"></div> <button class="btn btn-success btn-lg" type="submit">'+strings['save']+'</button></div></form></div>';
+            delegateHtml+='<div class="clearfix"></div><div class="clearfix" style="height: 10px;"></div><div class="col-md-12"><form id="ratingCustomerForm" action="" method="post"><div id="ratingCustomerForm-response"></div> <input type="hidden" name="user_id" value="'+orderData.user_id+'"> <input type="hidden" name="delegate_id" value="'+orderData.delegate_id+'"> <input type="hidden" id="order_id" name="order_id" value="'+orderData.order_id+'"> <input id="ratings-hidden" name="rating" type="hidden"> <div class="form-group"><textarea class="form-control animated" cols="50" id="new-review" name="comment" placeholder="'+strings['enter_your_review_her']+'" rows="5"></textarea></div>  <div class="text-right"> <div class="stars starrr" data-rating="0"></div> <button class="btn btn-success btn-lg" type="submit">'+strings['save']+'</button></div></form></div><div class="clearfix"></div><div class="clearfix" style="height: 20px;"></div>';
         }
 
 
     }
-
-    delegateHtml+='<div class="clearfix" style="height: 20px;"></div>';
     if(orderData.statues=='has_invoice'||orderData.statues=='confirm_invoice'||orderData.statues=='closed'){
-        delegateHtml+='<div class="col-lg-12"><button id="showInvoiceButton" class=" btn btn-info btn-block">'+strings['show_invoice']+'</button><div class="clearfix"></div><div id="invoiceImage" style="display: none;"><img class="order-image" data-title="'+strings['order_number']+' #'+orderData.order_id+'" style="width:100%;" src="'+SITEURL+orderData.invoice_img_dir+orderData.invoice_img+'"></div></div>';
+        delegateHtml+='<div class="col-lg-12"><button id="showInvoiceButton" class=" btn btn-info btn-block">'+strings['show_invoice']+'</button><div class="clearfix"></div><div id="invoiceImage" style="display: none;"><img class="order-image" data-title="'+strings['order_number']+' #'+orderData.order_id+'" style="width:100%;" src="'+SITEURL+orderData.invoice_img_dir+orderData.invoice_img+'"></div></div><div class="clearfix"></div><div class="clearfix" style="height: 20px;"></div>';
     }
-    delegateHtml+='<div class="clearfix" style="height: 20px;"></div>';
+
     /*if($.inArray( orderData.statues, ['confirm_invoice','closed','has_invoice'] )==-1){
         delegateHtml+='<div class="col-lg-12"><button id="cancel" class=" btn btn-info btn-block">'+strings['cancel']+'</button></div>';
     }*/
     if($.inArray(orderData.statues,['canceled','closed','confirm_invoice','has_invoice'])==-1&&(userData.id==orderData.delegate_id||userData.id==orderData.user_id)){
-        delegateHtml+='<div class="col-lg-12"><div class="col-lg-12"><button id="showCancelForm" class="btn btn-info btn-block" data-id="'+orderData.order_id+'">'+strings['show_cancel_form']+'</button><div class="clearfix"></div><div id="cancelOrderDiv" style="display: none;">  <form id="cancelOrderForm" action="" method="post"><input type="hidden" name="current_user_id" value="'+userData.id+'"><input type="hidden" name="order_id" value="'+orderData.order_id+'"><div class="form-group"><textarea class="form-control animated" cols="50" id="cancel_comment" name="cancel_comment" placeholder="'+strings['your_comment']+'" rows="5"></textarea></div> <button class="btn btn-success btn-lg" type="submit">'+strings['cancel']+'</button></form></div></div></div>'
+        delegateHtml+='<div class="col-lg-12"><div class="col-lg-12"><button id="showCancelForm" class="btn btn-info btn-block" data-id="'+orderData.order_id+'">'+strings['show_cancel_form']+'</button><div class="clearfix"></div><div id="cancelOrderDiv" style="display: none;">  <form id="cancelOrderForm" action="" method="post"><input type="hidden" name="current_user_id" value="'+userData.id+'"><input type="hidden" name="order_id" value="'+orderData.order_id+'"><div class="form-group"><textarea class="form-control animated" cols="50" id="cancel_comment" name="cancel_comment" placeholder="'+strings['your_comment']+'" rows="5"></textarea></div> <button class="btn btn-success btn-lg" type="submit">'+strings['cancel']+'</button></form></div></div></div><div class="clearfix"></div><div class="clearfix" style="height: 20px;"></div>'
     }
 
 
@@ -836,6 +834,10 @@ function successDB() {
 }
 
 function onDeviceReady() {
+
+	       var fb_success = function (data) {};
+            var fb_fail = function (data) {};
+            facebookConnectPlugin.activateApp(fb_success, fb_fail);
    /* console.log('window.cordova && window.cordova.plugins.keyboard=1=');
     console.log(Keyboard);
     if (typeof Keyboard.shrinkView!='undefined') {
@@ -916,7 +918,7 @@ function onDeviceReady() {
         });
     }
 
-    if(userData&&appSettings&&userData.type=='delegate'&&userData.balance>=appSettings.delegate_limit_cash){
+    if(userData&&appSettings&&userData.type=='delegate'&&userData.balance<=appSettings.delegate_limit_cash){
         $( ".page-cover" ).after('<div id="delegate-limited-message"><span>'+strings['delegated_limit_message']+'</span> <a href="payment_methods.html">'+strings['from_her']+'</a></div>');
     }
 
@@ -1679,10 +1681,27 @@ function sendlatlong(lastLongitude,lastLatitude) {
         });
     }
 }
+function showAvailableLocationMessage(lastLongitude,lastLatitude,language){
+    $.ajax({
+        type: "GET",
+        url: makeURL('foreraa_users/locationAvailable'),
+        data: {"lastLongitude": lastLongitude, "lastLatitude": lastLatitude,"lang":language},
+        success: function (msg) {
+            if(msg.message){
+                if($("#errorAvailableLocationMessage").length==0){
+                    $( ".page-cover" ).after('<div id="errorAvailableLocationMessage" style="margin-top: 10px;">'+msg.message+'</div>');
+                }
+            }
+
+        }
+    });
+
+}
 /*single parcel end code*/
  function onSuccess(position){
      var longitude = position.coords.longitude;
      var latitude = position.coords.latitude;
+     showAvailableLocationMessage(longitude,latitude,selectedLang);
      sendlatlong(longitude,latitude);
      setInterval(function(){
          console.log('send location')
@@ -2024,6 +2043,9 @@ var orderValidator = $("#order-form").validate({
                 getMessages(msg,"#response")
                 if(msg.success){
                     $("#order-form")[0].reset();
+                    setTimeout(function(){
+                        window.location.href="service.html";
+                    },4000)
                 }
                 $(".loader").hide();
             }

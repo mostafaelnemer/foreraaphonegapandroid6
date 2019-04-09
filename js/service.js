@@ -124,7 +124,7 @@ function serviceSearchOnGoogleMap(serviceData) {
         var service = new google.maps.places.PlacesService(document.createElement('div'));
         service.nearbySearch({
             location: pyrmont,
-            radius: 20000,
+            radius: 5000000,
            //type: [serviceData.google_key],
             keyword: serviceData.google_key,
             language:lang,
@@ -266,7 +266,7 @@ $(document).on('keyup','#searchForPlace',function(){
     var service = new google.maps.places.PlacesService(document.createElement('div'));
     service.nearbySearch({
         location: pyrmont,
-        radius: 20000,
+        radius: 5000000,
         keyword: searchFor,
         language:lang,
         rankby:'distance',

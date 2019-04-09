@@ -4,14 +4,27 @@ if(serviceData){
     serviceData=JSON.parse(serviceData);
     if(serviceData.type=='other'){
         $(".loader").show();
-        serviceSearchOnGoogleMap(serviceData);
-        PullToRefresh.init({
-            mainElement: '.page-wrapper', // above which element?
-            onRefresh: function (cb) {
-                serviceSearchOnGoogleMap(serviceData);
-                cb();
-            }
-        });
+        if(serviceData.category_list.length){
+            serviceGetCategoriesList(serviceData);
+            PullToRefresh.init({
+                mainElement: '.page-wrapper', // above which element?
+                onRefresh: function (cb) {
+                    serviceGetCategoriesList(serviceData);
+                    cb();
+                }
+            });
+        }else{
+            serviceSearchOnGoogleMap(serviceData);
+            PullToRefresh.init({
+                mainElement: '.page-wrapper', // above which element?
+                onRefresh: function (cb) {
+                    serviceSearchOnGoogleMap(serviceData);
+                    cb();
+                }
+            });
+        }
+
+
         /*window.document.addEventListener("scroll", function(){
             if(window.pageYOffset == 0){
                 serviceSearchOnGoogleMap(serviceData);
@@ -122,7 +135,7 @@ function serviceSearchOnGoogleMap(serviceData) {
         var service = new google.maps.places.PlacesService(document.createElement('div'));
         service.nearbySearch({
             location: pyrmont,
-            radius: 20000,
+            radius: 5000000,
             //type: [serviceData.google_key],
             language:lang,
             rankby:'distance',
@@ -183,6 +196,45 @@ function serviceSearchOnGoogleMap(serviceData) {
         window.location.href="services.html";
     }
 }
+function serviceGetCategoriesList(serviceData){
+    html='';
+    var userDataLongitude=Number(window.sessionStorage.getItem("userDataLongitude")),
+        userDataLatitude=Number(window.sessionStorage.getItem("userDataLatitude"));
+    destinationA=new google.maps.LatLng(userDataLatitude,userDataLongitude);
+    otherDestinations=[];
+    serviceData.category_list.forEach(function (item) {
+        otherDestinations.push(new google.maps.LatLng(item.latitude,item.longitude));
+    });
+
+    var MatrixService = new google.maps.DistanceMatrixService();
+    MatrixService.getDistanceMatrix({
+        origins: [destinationA],
+        destinations: otherDestinations,
+        travelMode: 'DRIVING',
+        unitSystem: google.maps.UnitSystem.METRIC,
+        avoidHighways: false,
+        avoidTolls: false
+    }, function(matrixResponse,matrixRequest){
+        responseArray=[];
+        x=0;
+        serviceData.category_list.forEach(function(item){
+            responseArray.push(item);
+            responseArray[x].longitude=otherDestinations[x].lng()
+            responseArray[x].latitude=otherDestinations[x].lat()
+            responseArray[x].distance=matrixResponse.rows[0].elements[x].distance.text
+            responseArray[x].duration=matrixResponse.rows[0].elements[x].duration.text
+            x++;
+        });
+        responseArray.forEach(function(item){
+            //html+='<li class="list-group-item"><a href="javascript:void(0)" class="single-location" data-longitude="'+otherDestinations[x].lng()+'" data-latitude="'+otherDestinations[x].lat()+'" data-address="'+item.vicinity+'" > <div class="col-xs-2 col-sm-2"> <img src="'+item.icon+'" alt="'+item.name+'" style="max-width: 100%" class="img-responsive img-circle" /> </div> <div class="col-xs-10 col-sm-10"> <span class="name">'+item.name+'</span> <div class="clearfix"></div> <span class="visible-xs"> <span class="text-muted">'+item.vicinity+'</span></span> <div class="clearfix"></div><span class="visible-xs"> <span class="text-muted">'+matrixResponse.rows[0].elements[x].distance.text+' - '+matrixResponse.rows[0].elements[x].duration.text+'</span></span>  <span class="pull-right"><span class="order-status1 success pull-right"><div class="stars-outer"> <div class="stars-inner" style="width: '+((typeof item.rating!='undefined')?(item.rating*100)/5:'')+'%"></div></div></span></span>   </div> <div class="clearfix"></div> </a></li>';
+            html+='<li class="list-group-item"><a href="javascript:void(0)" class="single-location" data-longitude="'+item.longitude+'" data-latitude="'+item.latitude+'" data-address="'+item.address+'" > <div class="col-xs-2 col-sm-2"> <img src="'+item.image+'" alt="'+item.name+'" style="max-width: 100%" class="img-responsive img-circle" /> </div> <div class="col-xs-10 col-sm-10"> <span class="name">'+item.name+'</span> <div class="clearfix"></div>  <div class="clearfix"></div><span class="visible-xs"> <span class="text-muted">'+item.distance+' - '+item.duration+'</span></span>   </div> <div class="clearfix"></div> </a></li>';
+            x++;
+        });
+        $("#services-list").html(html)
+
+    });
+
+}
 $(document).on('keyup','#searchForPlace',function(){
     searchFor=$(this).val();
     console.log(searchFor)
@@ -197,7 +249,7 @@ $(document).on('keyup','#searchForPlace',function(){
     var service = new google.maps.places.PlacesService(document.createElement('div'));
     service.nearbySearch({
         location: pyrmont,
-        radius: 20000,
+        radius: 5000000,
         keyword: searchFor,
         language:lang,
         rankby:'distance',
